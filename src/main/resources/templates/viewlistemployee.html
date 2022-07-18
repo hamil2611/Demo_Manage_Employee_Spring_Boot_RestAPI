@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container">
+    <table class="table mt-5 table-bordered">
+        <thead class="thead-dark text-center">
+        <tr>
+            <th>Tên Nhân Viên</th>
+            <th>Email</th>
+            <th>Ngày khởi tạo</th>
+            <th>Code Checkin</th>
+        </tr>
+        </thead>
+        <tbody class="text-center">
+        <tr th:each="user:${listemployee} " style="border: 1px solid black">
+            <td th:text="${user.fullname}"></td>
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.datecreated}"></td>
+            <td th:text="${user.codecheckin}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
