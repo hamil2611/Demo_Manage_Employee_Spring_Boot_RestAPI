@@ -9,6 +9,7 @@ import com.example.manageemployee.repository.RoleRepository;
 import com.example.manageemployee.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,8 @@ public class AdminController {
     ModelMapper modelMapper;
     @Autowired
     UserDAOImpl userDAOImpl;
-
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
     //ModelAttribute
     @ModelAttribute("listrole")
     public  List<Role> Role(){
@@ -52,7 +54,7 @@ public class AdminController {
         List<User> list = userRepository.findAll();
         //list.forEach(i -> System.out.println(i.getFullname()));
         //Lấy ROLE_EMPLOYEE
-        Optional<Role> role = roleRepository.findById(1);
+        Optional<Role> role = roleRepository.findById(2);
         //Tim User theo ROLE_EMPLOYEE
         List<User> listEmployee= userRepository.findAllByRole(role);
         listEmployee.forEach(i -> System.out.println(i.getFullname()));
@@ -77,17 +79,41 @@ public class AdminController {
 
     @PostMapping("/formnewuser")
     public  String newUser(@ModelAttribute("userform") UserDto udto, Model model){
-        if( udto.getRole() == null){
-            model.addAttribute("msg","Chọn Role cho User");
+        if( udto.getFullname() == ""){
+            model.addAttribute("msg","Fullname empty!");
             return "formnewuser";
         }
-
+        if( udto.getUsername() == ""){
+            model.addAttribute("msg","Username empty!");
+            return "formnewuser";
+        }
+        if( udto.getPassword() == ""){
+            model.addAttribute("msg","Password empty!");
+            return "formnewuser";
+        }
+        if( udto.getAddress() == ""){
+            model.addAttribute("msg","Address empty!");
+            return "formnewuser";
+        }
+        if( udto.getDateofbirth() == ""){
+            model.addAttribute("msg","DateOfBirth empty!");
+            return "formnewuser";
+        }
+        if( udto.getRole() == null){
+            model.addAttribute("msg","Select Role User");
+            return "formnewuser";
+        }
         User u = this.modelMapper.map(udto,User.class);
         Date date = new Date();
         int codecheckin = ThreadLocalRandom.current().nextInt(1000,10000);
+        List<User> user_checkCodeCheckin = userRepository.findAllByCodecheckin(codecheckin);
+        while (user_checkCodeCheckin.isEmpty()!=true){
+            codecheckin = ThreadLocalRandom.current().nextInt(1000,10000);
+            user_checkCodeCheckin = userRepository.findAllByCodecheckin(codecheckin);
+        }
         u.setCodecheckin(codecheckin);
         u.setDatecreated(date);
-        //userDAOImpl.AddUser(user);
+        u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
         userDAOImpl.newUser(u);
         model.addAttribute("msg","Thêm thành công");
         System.out.println("***End!***");
@@ -129,10 +155,7 @@ public class AdminController {
         }
         userRepository.deleteById(idConvert);
         List<User> list = userRepository.findAll();
-        //list.forEach(i -> System.out.println(i.getFullname()));
-        //Lấy ROLE_EMPLOYEE
         Optional<Role> role = roleRepository.findById(1);
-        //Tim User theo ROLE_EMPLOYEE
         List<User> listEmployee= userRepository.findAllByRole(role);
         listEmployee.forEach(i -> System.out.println(i.getFullname()));
         List<UserDto> listuserdto = listEmployee.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
@@ -141,3 +164,8 @@ public class AdminController {
     }
 
 }
+
+//Note
+//        Optional<User> userBCrypt = userRepository.findById(22);
+//        User userBCryptConvert = this.modelMapper.map(userBCrypt,User.class);
+//        System.out.println(bCryptPasswordEncoder.matches("dinhann",userBCryptConvert.getPassword()));

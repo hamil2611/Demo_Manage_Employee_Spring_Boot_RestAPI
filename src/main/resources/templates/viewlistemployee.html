@@ -28,6 +28,7 @@
             <td th:text="${user.datecreated}"></td>
             <td th:text="${user.codecheckin}"></td>
             <td><a th:href="@{deleteUser(id=${user.id})}" th:method="delete" class="btn btn-danger">Xóa</a></td>
+            <td><a th:href="@{editUser(id=${user.id})}" th:method="post" class="btn btn-warning">Sửa</a></td>
             <td></td>
         </tr>
         </tbody>

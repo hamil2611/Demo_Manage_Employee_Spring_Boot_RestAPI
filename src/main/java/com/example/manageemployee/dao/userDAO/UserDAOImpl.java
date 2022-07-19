@@ -5,6 +5,8 @@ import com.example.manageemployee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UserDAOImpl implements UserDAO {
     @Autowired
@@ -23,5 +25,12 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public void deleteUser(int id) {
 
+    }
+
+    @Override
+    public List<User> getUser(String username) {
+        List<User> listUser = userRepository.findAllByUsername(username);
+        listUser.forEach(i-> System.out.println(i.getFullname()));
+        return listUser;
     }
 }
