@@ -3,13 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
 <body>
-<form th:action="@{/register}" th:object="${userform}" method="POST">
-    User Name:
-    <input type="text" th:field="${userform.setFullname()}"/>
-    <input type="text" />
-    <input type="submit">
-</form>
+<div class="container justify-content-center align-content-center d-flex">
+    <form style="width: 500px" class="mt-5" th:action="@{formnewuser}" th:object="${userform}" method="POST">
+        <h4>THÔNG TIN NHÂN VIÊN</h4>
+        <p>Full name:</p>
+        <p><input class="w-75" type="text" th:field="*{fullname}" /></p>
+        <p>Username:</p>
+        <p><input class="w-75" type="text" th:field="*{username}" /></p>
+        <p>Password:</p>
+        <p><input class="w-75" type="password" th:field="*{password}" /></p>
+        <p>Email:</p>
+        <p><input class="w-75" type="email" th:field="*{email}" /></p>
+        <p>Address:</p>
+        <p><input class="w-75" type="text" th:field="*{address}" /></p>
+        <p>DateOfBirth:</p>
+        <p><input class="w-75" type="date" th:field="*{dateofbirth}" /></p>
+        <p>Role: </p>
+        <p>
+            <select th:field="*{role}" class="w-75">
+                <option value="">SELECT ROLE</option>
+                <option th:each="r : ${listrole}"
+                        th:value="${r.id}" th:text="${r.name}"></option>
+            </select>
+        </p>
+        <p>
+            <input type="submit" class="btn btn-info offset-3 w-25">
+        </p>
+        <p th:text="${msg}">
+
+        </p>
+    </form>
+</div>
 </body>
 </html>
