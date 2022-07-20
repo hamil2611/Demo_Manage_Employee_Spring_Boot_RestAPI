@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -51,16 +51,9 @@ public class AdminController {
     //HTTP Method
     @GetMapping("/viewemployee")
     public String viewEmployee(Model model){
-        List<User> list = userRepository.findAll();
-        //list.forEach(i -> System.out.println(i.getFullname()));
-        //Lấy ROLE_EMPLOYEE
         Optional<Role> role = roleRepository.findById(2);
-        //Tim User theo ROLE_EMPLOYEE
         List<User> listEmployee= userRepository.findAllByRole(role);
-        listEmployee.forEach(i -> System.out.println(i.getFullname()));
-        List<UserDto> listuserdto = listEmployee.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
-        //listuserdto.forEach(i-> System.out.println(i.getEmail()));
-
+        //List<UserDto> listuserdto = listEmployee.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
         model.addAttribute("listemployee",listEmployee);
         return "viewlistemployee";
     }
@@ -78,7 +71,7 @@ public class AdminController {
     }
 
     @PostMapping("/formnewuser")
-    public  String newUser(@ModelAttribute("userform") UserDto udto, Model model){
+    public  String newUser(@ModelAttribute("userform") UserDto udto, Model model) throws ParseException {
         if( udto.getFullname() == ""){
             model.addAttribute("msg","Fullname empty!");
             return "formnewuser";
@@ -104,7 +97,16 @@ public class AdminController {
             return "formnewuser";
         }
         User u = this.modelMapper.map(udto,User.class);
+        List<User> user_checkUsername = userRepository.findAllByUsername(u.getUsername());
+        if(user_checkUsername.isEmpty()!=true){
+            model.addAttribute("msg","Username da ton tai!");
+            return "formnewuser";
+        }
+
         Date date = new Date();
+//        SimpleDateFormat DateFor = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+//        String stringDate = DateFor.format(date);
+//        date = DateFor.parse(stringDate);
         int codecheckin = ThreadLocalRandom.current().nextInt(1000,10000);
         List<User> user_checkCodeCheckin = userRepository.findAllByCodecheckin(codecheckin);
         while (user_checkCodeCheckin.isEmpty()!=true){
@@ -114,7 +116,7 @@ public class AdminController {
         u.setCodecheckin(codecheckin);
         u.setDatecreated(date);
         u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
-        userDAOImpl.newUser(u);
+        userRepository.save(u);
         model.addAttribute("msg","Thêm thành công");
         System.out.println("***End!***");
         return "formnewuser";
@@ -122,43 +124,22 @@ public class AdminController {
 
     @GetMapping("/editUser")
     public  String editUser(){
-        User user = new User();
-        user.setId(52);
-        user.setFullname("Dinh An");
-        user.setUsername("dinhan");
-        user.setPassword("dinhan");
-        user.setEmail("dinhan@gmail.com");
-        //userDAOImpl.AddUser(user);
 
-        Role role = new Role();
-        role.setId(1);
-        role.setName("ADMIN");
-        user.setRole(role);
-
-        userDAOImpl.newUser(user);
-        System.out.println("***End!***");
         return "newuser";
     }
-    @GetMapping("/deleteUser")
+    @GetMapping ("/deleteUser")
     public String deleteUser(@RequestParam String id, Model model){
-        System.out.println("id"+id);
         int idConvert = Integer.parseInt(id);
         Optional<User> usercheck = userRepository.findById(idConvert);
         if(usercheck.isEmpty()){
-            List<User> list = userRepository.findAll();
-            Optional<Role> role = roleRepository.findById(1);
+            Optional<Role> role = roleRepository.findById(2);
             List<User> listEmployee= userRepository.findAllByRole(role);
-            listEmployee.forEach(i -> System.out.println(i.getFullname()));
-            List<UserDto> listuserdto = listEmployee.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
             model.addAttribute("listemployee",listEmployee);
             return "viewlistemployee";
         }
         userRepository.deleteById(idConvert);
-        List<User> list = userRepository.findAll();
-        Optional<Role> role = roleRepository.findById(1);
+        Optional<Role> role = roleRepository.findById(2);
         List<User> listEmployee= userRepository.findAllByRole(role);
-        listEmployee.forEach(i -> System.out.println(i.getFullname()));
-        List<UserDto> listuserdto = listEmployee.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
         model.addAttribute("listemployee",listEmployee);
         return "viewlistemployee";
     }

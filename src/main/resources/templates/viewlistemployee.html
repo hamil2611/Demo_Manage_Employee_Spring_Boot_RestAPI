@@ -15,8 +15,10 @@
             <th>Email</th>
             <th>Ngày khởi tạo</th>
             <th>Code Checkin</th>
+            <th>Phân Quyền</th>
             <th>Xóa</th>
             <th>Sửa</th>
+            <th>Xem Checkin</th>
 
         </tr>
         </thead>
@@ -27,9 +29,10 @@
             <td th:text="${user.email}"></td>
             <td th:text="${user.datecreated}"></td>
             <td th:text="${user.codecheckin}"></td>
-            <td><a th:href="@{deleteUser(id=${user.id})}" th:method="delete" class="btn btn-danger">Xóa</a></td>
-            <td><a th:href="@{editUser(id=${user.id})}" th:method="post" class="btn btn-warning">Sửa</a></td>
-            <td></td>
+            <td th:text="${user.getRole().getName()}"></td>
+            <td><a th:href="@{deleteUser(id=${user.id})}" class="btn btn-danger">Xóa</a></td>
+            <td><a th:href="@{editUser(id=${user.id})}" class="btn btn-warning">Sửa</a></td>
+            <td><a th:href="@{/viewcheckin(id=${user.codecheckin})}" class="btn btn-warning">Xem Checkin</a></td>
         </tr>
         </tbody>
     </table>

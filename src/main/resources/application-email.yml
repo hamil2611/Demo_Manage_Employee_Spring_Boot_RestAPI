@@ -1,0 +1,18 @@
+spring:
+  main:
+    web-application-type: none
+
+  mail:
+    host: ${FOOD_MAIL_HOST:smtp.gmail.com}
+    port: ${FOOD_MAIL_PORT:587}
+    username: ${FOOD_MAIL_USERNAME:my.name@gmail.com}
+    password: ${FOOD_MAIL_PASSWORD:mypassword}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  freemarker:
+    charset: UTF-8
+    template-loader-path: classpath:/templates

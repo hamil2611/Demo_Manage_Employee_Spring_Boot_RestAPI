@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="justify-content-center align-content-center d-flex">
+
+
+    <form class="mt-5 col-4" th:action="@{/checkin}" th:object="${checkinform}" method="POST">
+        <h4 class="text-center">CHECKIN/CHECKOUT</h4>
+        <p>ENTER CODECHECKIN</p>
+        <p><input class="w-100" type="text" th:field="*{codecheckin}" /></p>
+             <input style="margin-left: 160px" type="submit" class="btn btn-info w-25">
+        </p>
+        <p class="text-center" th:text="${msgreport}"></p>
+        <p class="text-center" th:text="${msghello}"></p>
+
+    </form>
+</div>
+</body>
+</html>
