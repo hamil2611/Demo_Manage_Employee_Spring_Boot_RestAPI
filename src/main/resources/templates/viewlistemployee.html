@@ -23,16 +23,16 @@
         </tr>
         </thead>
         <tbody class="text-center">
-        <tr th:each="user:${listemployee} " style="border: 1px solid black">
-            <td th:text="${user.id}"></td>
-            <td th:text="${user.fullname}"></td>
-            <td th:text="${user.email}"></td>
-            <td th:text="${user.datecreated}"></td>
-            <td th:text="${user.codecheckin}"></td>
-            <td th:text="${user.getRole().getName()}"></td>
-            <td><a th:href="@{deleteUser(id=${user.id})}" class="btn btn-danger">Xóa</a></td>
-            <td><a th:href="@{editUser(id=${user.id})}" class="btn btn-warning">Sửa</a></td>
-            <td><a th:href="@{/viewcheckin(id=${user.codecheckin})}" class="btn btn-warning">Xem Checkin</a></td>
+        <tr th:each="userdto:${listemployee} " style="border: 1px solid black">
+            <td th:text="${userdto.id}"></td>
+            <td th:text="${userdto.fullname}"></td>
+            <td th:text="${userdto.email}"></td>
+            <td th:text="${userdto.datecreated}"></td>
+            <td th:text="${userdto.codecheckin}"></td>
+            <td th:text="${userdto.getRole().getName()}"></td>
+            <td><a th:href="@{deleteUser(id=${userdto.id})}" class="btn btn-danger">Xóa</a></td>
+            <td><a th:href="@{editUser(id=${userdto.id})}" class="btn btn-warning">Sửa</a></td>
+            <td><a th:href="@{/viewcheckin(id=${userdto.codecheckin})}" class="btn btn-warning">Xem Checkin</a></td>
         </tr>
         </tbody>
     </table>

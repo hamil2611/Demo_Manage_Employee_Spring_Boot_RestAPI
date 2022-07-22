@@ -9,12 +9,12 @@
 <div class="container justify-content-center align-content-center d-flex">
 
 
-    <form style="width: 450px" class="mt-5" th:action="@{/login}" th:object="${userform}" method="POST">
+    <form style="width: 450px" class="mt-5" th:action="@{/login}" th:object="${userDto}" method="POST">
         <h4>INFORMATION EMPLOYEE</h4>
         <p>Username:</p>
-        <p><input class="w-100" type="text" th:field="*{username}" /></p>
+        <p><input class="w-100" type="text"  /></p>
         <p>Password:</p>
-        <p><input class="w-100" type="password" th:field="*{password}" /></p>
+        <p><input class="w-100" type="password" /></p>
         <p>
             <input type="submit" class="btn btn-info offset-4 w-25">
         </p>

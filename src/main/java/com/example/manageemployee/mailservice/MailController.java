@@ -32,7 +32,7 @@ public class MailController {
         msg.setText(content);
         javaMailSender.send(msg);
     }
-    @Scheduled(cron = "00 50 15 * * ?")
+    @Scheduled(cron = "00 37 10 * * ?")
     public void scheduleTaskUsingCronExpression() throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         List<User> list_user = userRepository.findAll();

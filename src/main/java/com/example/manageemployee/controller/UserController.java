@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     UserDAOImpl userDAOImpl;
-
     @Autowired
     RoleRepository roleRepository;
 

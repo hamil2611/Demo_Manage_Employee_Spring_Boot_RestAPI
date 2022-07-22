@@ -9,7 +9,7 @@
 <div class="container justify-content-center align-content-center d-flex">
 
 
-    <form style="width: 450px" class="mt-5" th:action="@{formnewuser}" th:object="${userform}" method="POST">
+    <form style="width: 450px" class="mt-5" th:action="@{formnewuser}" th:object="${userDto}" method="POST">
             <div th:if= "${msg!=''}">
                 <div  class="alert alert-success">
                     <p th:text="${msg}">
