@@ -1,6 +1,6 @@
-package com.example.manageemployee.dto;
+package com.example.manageemployee.model.dto;
 
-import com.example.manageemployee.entity.Role;
+import com.example.manageemployee.model.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

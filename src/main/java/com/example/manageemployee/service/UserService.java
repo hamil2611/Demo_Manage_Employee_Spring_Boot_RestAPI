@@ -1,6 +1,6 @@
 package com.example.manageemployee.service;
 
-import com.example.manageemployee.entity.User;
+import com.example.manageemployee.model.entity.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;

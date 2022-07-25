@@ -1,4 +1,4 @@
-package com.example.manageemployee.dto;
+package com.example.manageemployee.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,11 +7,15 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+@Entity
+@Table
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class CheckinDto {
+public class Checkin {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Date timecheckin;
     private Date timecheckout;

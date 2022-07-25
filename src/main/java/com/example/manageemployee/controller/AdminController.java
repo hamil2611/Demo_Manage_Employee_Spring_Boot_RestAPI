@@ -1,9 +1,8 @@
 package com.example.manageemployee.controller;
 
-import com.example.manageemployee.dao.userDAO.UserDAOImpl;
-import com.example.manageemployee.dto.RoleDto;
-import com.example.manageemployee.dto.UserDto;
-import com.example.manageemployee.entity.Role;
+import com.example.manageemployee.model.dto.RoleDto;
+import com.example.manageemployee.model.dto.UserDto;
+import com.example.manageemployee.model.entity.Role;
 import com.example.manageemployee.repository.RoleRepository;
 import com.example.manageemployee.service.userDAOService.UserDAOServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,6 @@ import java.util.List;
 public class AdminController {
     @Autowired
     UserDAOServiceImpl userDAOServiceImpl;
-    @Autowired
-    UserDAOImpl userDAOImpl;
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
@@ -92,6 +89,7 @@ public class AdminController {
     public  String editUser(){
         return "newuser";
     }
+
     @GetMapping ("/deleteUser")
     public String deleteUser(@RequestParam String id, Model model){
         int idConvert = Integer.parseInt(id);
@@ -99,5 +97,4 @@ public class AdminController {
         model.addAttribute("listemployee",listEmployee);
         return "viewlistemployee";
     }
-
 }

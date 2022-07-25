@@ -1,8 +1,11 @@
 package com.example.manageemployee.service.userDAOService;
 
-import com.example.manageemployee.dto.UserDto;
-import com.example.manageemployee.entity.Role;
-import com.example.manageemployee.entity.User;
+import com.example.manageemployee.model.dto.CheckinDto;
+import com.example.manageemployee.model.dto.UserDto;
+import com.example.manageemployee.model.entity.Checkin;
+import com.example.manageemployee.model.entity.Role;
+import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.repository.CheckinRepository;
 import com.example.manageemployee.repository.RoleRepository;
 import com.example.manageemployee.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +27,8 @@ public class UserDAOServiceImpl implements  UserDAOService{
     @Autowired
     RoleRepository roleRepository;
     @Autowired
+    CheckinRepository checkinRepository;
+    @Autowired
     ModelMapper modelMapper;
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -34,13 +40,13 @@ public class UserDAOServiceImpl implements  UserDAOService{
             return false;
         }
         Date date = new Date();
-        int codecheckin=0;
+        int codeCheckin=0;
         List<Integer> listCodeCheckin = userRepository.findAllCodecheckin();
         while(true){
             int tmp=0;
-            codecheckin = ThreadLocalRandom.current().nextInt(1000,10000);
+            codeCheckin = ThreadLocalRandom.current().nextInt(1000,10000);
             for(Integer i:listCodeCheckin){
-                if(i==codecheckin){
+                if(i==codeCheckin){
                     tmp++;
                     break;
                 }
@@ -49,7 +55,7 @@ public class UserDAOServiceImpl implements  UserDAOService{
                 break;
             }
         }
-        u.setCodecheckin(codecheckin);
+        u.setCodecheckin(codeCheckin);
         u.setDatecreated(date);
         u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
         userRepository.save(u);
@@ -90,5 +96,39 @@ public class UserDAOServiceImpl implements  UserDAOService{
         Optional<User> user = userRepository.findById(id);
         UserDto userDto = this.modelMapper.map(user,UserDto.class);
         return userDto;
+    }
+    @Override
+    public UserDto Checkin(CheckinDto checkinDto){
+        Checkin checkin = this.modelMapper.map(checkinDto,Checkin.class);
+        Date date = new Date();
+        if(userRepository.findAllByCodecheckin(checkinDto.getCodecheckin()).isEmpty()!=true){
+            SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+            String today = format.format(date);
+            List<Checkin> listcheckin = checkinRepository.findAllByCodecheckin(checkin.getCodecheckin());
+            //Check xem employee da checkin trong ngay do chua
+            if(listcheckin.isEmpty()!=true){
+                Checkin checkinToday = listcheckin.get(0);
+                if(format.format(checkinToday.getDatecreated()).equals(today)){
+                    checkinToday.setTimecheckout(date);
+                    checkinRepository.save(checkinToday);
+                }else{
+                    checkin.setTimecheckin(date);
+                    checkin.setDatecreated(date);
+                    checkinRepository.save(checkin);
+                }
+            }else {
+                checkin.setDatecreated(date);
+                checkin.setTimecheckin(date);
+                checkinRepository.save(checkin);
+            }
+        }else{
+            return null;
+        }
+        UserDto userDto = this.modelMapper.map(userRepository.findAllByCodecheckin(checkinDto.getCodecheckin()).get(0),UserDto.class);
+        System.out.println(userDto.getFullname());
+        return userDto;
+    }
+    public List<User> getUserByUsername(String username){
+        return userRepository.findAllByUsername(username);
     }
 }

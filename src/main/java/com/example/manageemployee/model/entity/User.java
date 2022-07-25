@@ -1,4 +1,4 @@
-package com.example.manageemployee.entity;
+package com.example.manageemployee.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

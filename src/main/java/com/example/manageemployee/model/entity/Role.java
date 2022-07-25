@@ -1,4 +1,4 @@
-package com.example.manageemployee.entity;
+package com.example.manageemployee.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,19 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.io.Serializable;
+
 @Entity
-@Table
+@Table(name="role")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Checkin {
+public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private Date timecheckin;
-    private Date timecheckout;
-    private int codecheckin;
-    private Date datecreated;
+    @Column(name="name")
+    private String name;
+
 }

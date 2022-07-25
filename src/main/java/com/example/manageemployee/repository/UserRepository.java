@@ -1,7 +1,7 @@
 package com.example.manageemployee.repository;
 
-import com.example.manageemployee.entity.Role;
-import com.example.manageemployee.entity.User;
+import com.example.manageemployee.model.entity.Role;
+import com.example.manageemployee.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

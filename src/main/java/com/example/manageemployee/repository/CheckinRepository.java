@@ -1,6 +1,6 @@
 package com.example.manageemployee.repository;
 
-import com.example.manageemployee.entity.Checkin;
+import com.example.manageemployee.model.entity.Checkin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
