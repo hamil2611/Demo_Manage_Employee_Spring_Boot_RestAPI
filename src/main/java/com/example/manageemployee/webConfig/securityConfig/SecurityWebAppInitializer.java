@@ -1,4 +1,4 @@
-package com.example.manageemployee.service;
+package com.example.manageemployee.webConfig.securityConfig;
 
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 

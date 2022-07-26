@@ -2,60 +2,46 @@ package com.example.manageemployee.controller;
 
 import com.example.manageemployee.model.dto.CheckinDto;
 import com.example.manageemployee.model.dto.UserDto;
-import com.example.manageemployee.model.entity.Checkin;
-import com.example.manageemployee.service.mailService.MailController;
-import com.example.manageemployee.repository.CheckinRepository;
-import com.example.manageemployee.repository.UserRepository;
+import com.example.manageemployee.model.entity.ReportCheckin;
+import com.example.manageemployee.model.enummodel.EnumStatus;
+import com.example.manageemployee.repository.ReportCheckinRepository;
+import com.example.manageemployee.service.checkinDAOService.CheckinDAOServiceImpl;
+import com.example.manageemployee.service.mailService.MailService;
 import com.example.manageemployee.service.userDAOService.UserDAOServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-@Controller
+@RestController
 public class CheckinController {
-    @Autowired
-    CheckinRepository checkinRepository;
     @Autowired
     UserDAOServiceImpl userDAOServiceImpl;
     @Autowired
-    UserRepository userRepository;
+    CheckinDAOServiceImpl checkinDAOServiceImpl;
     @Autowired
-    MailController mailController;
+    MailService mailController;
     @Autowired
     ModelMapper modelMapper;
-    @ModelAttribute("checkinform")
-    public CheckinDto checkin(){
-        return new CheckinDto();
-    }
     @GetMapping("/checkin")
     public String employeeCheckin(){
-
         return "checkinform";
     }
     @PostMapping("/checkin")
-    public String employeeCheckin(@ModelAttribute("checkinform") CheckinDto checkinDto, Model model){
+    public String employeeCheckin(@RequestBody CheckinDto checkinDto){
         if(checkinDto.getCodecheckin()==0){
-            return "checkinform";
+            return "CODECHECKIN DOES NOT EXIST!";
         }else{
             UserDto userDto = userDAOServiceImpl.Checkin(checkinDto);
             if(userDto==null){
-                model.addAttribute("msgreport","CODECHECKIN DOES NOT EXIST");
-                return "checkinform";
+                return "USER DOES NOT EXIST!";
             }
             else {
-                model.addAttribute("msgreport","CHECKIN SUCCESSFULLY!");
-                model.addAttribute("msghello", "HELLO!   " + userDto.getFullname());
-                return "checkinform";
+                return "HELLO" + " " + userDto.getFullname();
             }
         }
     }
-    @GetMapping("/viewcheckin")
-    public String ViewCheckin(@RequestParam int id, Model model){
-        List<Checkin> listcheckin = checkinRepository.findAllByCodecheckin(id);
-        model.addAttribute("listcheckin",listcheckin);
-        return "viewcheckin";
-    }
+
 }

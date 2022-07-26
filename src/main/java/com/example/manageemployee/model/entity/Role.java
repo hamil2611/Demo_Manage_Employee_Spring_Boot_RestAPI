@@ -20,5 +20,9 @@ public class Role implements Serializable {
     private int id;
     @Column(name="name")
     private String name;
-
+//    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<User> users;
+//    public List<User> getUsers(){
+//        return users;
+//    }
 }

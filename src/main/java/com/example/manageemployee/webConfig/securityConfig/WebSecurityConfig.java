@@ -1,4 +1,4 @@
-package com.example.manageemployee.webConfig;
+package com.example.manageemployee.webConfig.securityConfig;
 
 import com.example.manageemployee.jwt.JwtEntryPoint;
 import com.example.manageemployee.jwt.JwtTokenFilter;
@@ -8,19 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import javax.sql.DataSource;
-
 @Configuration
-@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -42,23 +35,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.jdbcAuthentication().dataSource(dataSource)
-//                .usersByUsernameQuery("SELECT username, password FROM user where username=?")
-//                .authoritiesByUsernameQuery("SELECT username, role.name FROM user, role WHERE " +
-//                        "user.roleid=role.id");
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
     }
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.formLogin().loginPage("/login")
-                .usernameParameter("username")
-                .passwordParameter("password").permitAll();
         http.authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers().authenticated()
-                .antMatchers("**/admin/**").access("hasRole('ROLE_ADMIN')")
-                .antMatchers("**/user/**").access("hasRole('ROLE_EMPLOYEE')");
-        http.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                .antMatchers("/home","/login","/logout","/test","/admin/**","/checkin/**").permitAll();
+
+//        http.authorizeRequests()
+//                //.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+//                .antMatchers("/checkin/**").access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_ADMIN')");
+
+        http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/login");
+
+        http.formLogin().loginPage("/login")
+                .defaultSuccessUrl("/login?successfully")//đây Khi đăng nhập thành công thì vào trang này. userAccountInfo sẽ được khai báo trong controller để hiển thị trang view tương ứng
+                .failureUrl("/login?error=true")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .and()
+                .logout().permitAll();
+
         http.csrf().disable();
     }
 

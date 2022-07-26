@@ -1,8 +1,6 @@
 package com.example.manageemployee.jwt;
 
-import com.example.manageemployee.service.UserService;
-import com.example.manageemployee.service.UserServiceImpl;
-import com.nimbusds.jose.proc.SecurityContext;
+import com.example.manageemployee.webConfig.securityConfig.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
     private JwtProvider jwtProvider;
     @Autowired
-    UserServiceImpl userServiceImpl;
+    UserDetailsServiceImpl userServiceImpl;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{

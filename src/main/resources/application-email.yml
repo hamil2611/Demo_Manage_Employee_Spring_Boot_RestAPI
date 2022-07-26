@@ -1,1 +1,3 @@
-scheduled.cronjob : "40 32 09 * * ?"
+scheduled.cronjob: "30 57 16 * * ?"
+mail.username: "ngdinhan2611@gmail.com"
+mail.password: "vgmmfhecsbsuswdn"

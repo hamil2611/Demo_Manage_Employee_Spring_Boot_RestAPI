@@ -17,4 +17,5 @@ public class CheckinDto {
     private Date timecheckout;
     private int codecheckin;
     private Date datecreated;
+    private String calendar;
 }

@@ -2,18 +2,17 @@ package com.example.manageemployee.controller;
 
 import com.example.manageemployee.model.dto.RoleDto;
 import com.example.manageemployee.model.dto.UserDto;
-import com.example.manageemployee.model.entity.Role;
-import com.example.manageemployee.repository.RoleRepository;
+import com.example.manageemployee.model.entity.ReportCheckin;
+import com.example.manageemployee.service.checkinDAOService.CheckinDAOServiceImpl;
 import com.example.manageemployee.service.userDAOService.UserDAOServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class AdminController {
     @Autowired
@@ -21,13 +20,8 @@ public class AdminController {
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
-    RoleRepository roleRepository;
+    CheckinDAOServiceImpl checkinDAOServiceImpl;
     //ModelAttribute
-    @ModelAttribute("listrole")
-    public  List<Role> Role(){
-        List<Role> listrole = roleRepository.findAll();
-        return listrole;
-    }
     @ModelAttribute("userDto")
     public UserDto userDto() {
         return new UserDto();
@@ -39,62 +33,48 @@ public class AdminController {
 
     //HTTP Method
     @GetMapping("/viewemployee")
-    public String viewEmployee(Model model){
-        List<UserDto> listUserDto = userDAOServiceImpl.findAll();
-        model.addAttribute("listemployee",listUserDto);
-        return "viewlistemployee";
+    public List<UserDto> viewEmployee(){
+        List<UserDto> listUserDto = userDAOServiceImpl.findAllEmployee();
+        listUserDto.forEach(i-> System.out.println(i.getFullname()));
+        return listUserDto;
     }
-    @GetMapping("/formnewuser")
-    public String formNewUser(){
-        return "formnewuser";
+    @GetMapping("/viewemployee/detail")
+    public UserDto viewEmployee(@RequestParam int id){
+        UserDto userDto = userDAOServiceImpl.getUser(id);
+        return userDto;
     }
-
-    @PostMapping("/formnewuser")
-    public  String newUser(@ModelAttribute("userDto") UserDto udto, Model model) throws ParseException {
-        if( udto.getFullname() == ""){
-            model.addAttribute("msg","Fullname empty!");
-            return "formnewuser";
-        }
-        if( udto.getUsername() == ""){
-            model.addAttribute("msg","Username empty!");
-            return "formnewuser";
-        }
-        if( udto.getPassword() == ""){
-            model.addAttribute("msg","Password empty!");
-            return "formnewuser";
-        }
-        if( udto.getAddress() == ""){
-            model.addAttribute("msg","Address empty!");
-            return "formnewuser";
-        }
-        if( udto.getDateofbirth() == ""){
-            model.addAttribute("msg","DateOfBirth empty!");
-            return "formnewuser";
-        }
-        if( udto.getRole() == null){
-            model.addAttribute("msg","Select Role User");
-            return "formnewuser";
-        }
-
+    @PostMapping("/newuser")
+    public  String newUser(@RequestBody UserDto udto) throws ParseException {
         if(userDAOServiceImpl.addUser(udto)){
-            model.addAttribute("msg","Add Employee Successfully!");
-            return "formnewuser";
+            return "Add user successfully!";
         }
         else {
-            model.addAttribute("msg","Add Employee Error!");
-            return "formnewuser";
+            return "Add user fail!";
         }
     }
-    @GetMapping("/editUser")
-    public  String editUser(){
-        return "newuser";
+    @PutMapping("/updateuser")
+    public  String editUser(@RequestBody UserDto userDto){
+        if(userDAOServiceImpl.updateUser(userDto))
+            return "Update Successfully!";
+        else {
+            return "Update Fail!";
+        }
     }
-
-    @GetMapping ("/deleteUser")
-    public String deleteUser(@RequestParam String id, Model model){
-        int idConvert = Integer.parseInt(id);
-        List<UserDto> listEmployee = userDAOServiceImpl.deleteUser(idConvert);
-        model.addAttribute("listemployee",listEmployee);
-        return "viewlistemployee";
+    @DeleteMapping("/deleteuser")
+    public String deleteUser(@RequestParam int id, Model model){
+        if(userDAOServiceImpl.deleteUser(id)){
+            return "Delete User Successfully!";
+        }
+        else{
+            return "Delete Fail!";
+        }
+    }
+    @GetMapping("/statistics/reportcheckin")
+    public List<ReportCheckin> showReportcheckin(){
+        try {
+            return checkinDAOServiceImpl.StatisticsReportCheckin();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
