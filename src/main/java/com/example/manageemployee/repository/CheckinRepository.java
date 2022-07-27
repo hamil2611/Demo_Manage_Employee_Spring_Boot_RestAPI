@@ -13,6 +13,8 @@ public interface CheckinRepository extends JpaRepository<Checkin,Integer> {
     @Query("SELECT c FROM Checkin as c where c.codecheckin =:codecheckin order by c.timecheckin desc ")
     List<Checkin> findAllByCodecheckin(int codecheckin);
     List<Checkin> findAllByDatecreated(Date datecreated);
+    @Query("SELECT c.codecheckin From Checkin as c")
+    List<Integer> getAllCodecheckin();
 
 }
 

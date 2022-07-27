@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import java.text.ParseException;
 
 @RestController
@@ -28,20 +29,17 @@ public class LoginController {
         return new UserDto();
     }
     @PostMapping("/register")
-    public  String registerUser(@RequestBody UserDto udto) throws ParseException {
+    public  String registerUser(@RequestBody UserDto udto) throws ParseException, MessagingException {
         if(userDAOServiceImpl.addUser(udto)){
             User user = this.modelMapper.map(udto,User.class);
-            mailService.SendMailRegister(user);
+            mailService.SendMailFile(user);
             return "Add user successfully!";
         }
         else {
             return "Add user fail!";
         }
     }
-    @GetMapping("/login")
-    public String login(){
-        return "login";
-    }
+
 //    @PostMapping("/login")
 //    public String login(@ModelAttribute("userform") UserDto udto){
 //        Authentication auth =authenticationManager.authenticate(

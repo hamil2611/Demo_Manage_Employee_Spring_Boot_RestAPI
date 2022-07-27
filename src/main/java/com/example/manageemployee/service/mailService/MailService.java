@@ -9,11 +9,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,6 +50,16 @@ public class MailService {
         msg.setText("You have successfully registered and logged in.");
         this.mailSender.send(msg);
     }
+    public void SendMailFile(User user) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,true,"utf-8");
+        FileSystemResource file = new FileSystemResource(new File("src/main/java/com/example/manageemployee/service/mailService/mail.txt"));
+        helper.addAttachment("Demo File",file);
+        helper.setTo(user.getEmail());
+        helper.setSubject("MAIL REGISTER SUCCESSFULLY!");
+        helper.setText("You have successfully registered and logged in.");
+        mailSender.send(mimeMessage);
+    }
     @Scheduled(cron ="${scheduled.cronjob}")
     public void scheduleTaskUsingCronExpression() throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
@@ -56,16 +70,17 @@ public class MailService {
         System.out.println(list_checkin.size());
         list_checkin.forEach(i->{
             try {
-                String content="";
                 Date timeCheckin = format.parse(format.format(i.getTimecheckin()));
                 if (timeCheckin.before(format.parse("08:30:00"))){
-                    System.out.println("true");
                     Date timeCheckout = format.parse(format.format(i.getTimecheckout()));
                     if(timeCheckout.before(format.parse("17:30:00"))){//checkout truoc gio
-                        content = "check out som" + format.format(i.getTimecheckout());
-                        List<User> listUserChecklate= userRepository.findAllByCodecheckin(i.getCodecheckin());
-                        listUser.remove(listUserChecklate.get(0));
-                        SendMailCheckinLate(listUserChecklate.get(0),content);
+                        listUser.forEach(user->{
+                            if(user.getCodecheckin()==i.getCodecheckin()){
+                                String content1 = "check out som" + format.format(i.getTimecheckout());
+                                listUser.remove(user);
+                                SendMailCheckinLate(user,content1);
+                            }
+                        });
                     }else{
                         List<User> list_user_checklate= userRepository.findAllByCodecheckin(i.getCodecheckin());
                         listUser.remove(list_user_checklate.get(0));
@@ -74,16 +89,22 @@ public class MailService {
                     if(i.getTimecheckout()!=null) { //
                         Date timeCheckout = format.parse(format.format(i.getTimecheckout()));
                         if(timeCheckout.before(format.parse("17:30:00"))){//checkout truoc gio
-                            content = "Đi làm muộn"+ format.format(i.getTimecheckin())+ "và check out som" + format.format(i.getTimecheckout());
-                            List<User> listUserChecklate= userRepository.findAllByCodecheckin(i.getCodecheckin());
-                            listUser.remove(listUserChecklate.get(0));
-                            SendMailCheckinLate(listUserChecklate.get(0),content);
+                            listUser.forEach(user->{
+                                if(user.getCodecheckin()==i.getCodecheckin()){
+                                    String content1 = "check out som" + format.format(i.getTimecheckout());
+                                    listUser.remove(user);
+                                    SendMailCheckinLate(user,content1);
+                                }
+                            });
                         }
                     }else{//khong check out
-                        content = "Đi làm muộn và không check out";
-                        List<User> list_user_checklate= userRepository.findAllByCodecheckin(i.getCodecheckin());
-                        listUser.remove(list_user_checklate.get(0));
-                        SendMailCheckinLate(list_user_checklate.get(0),content);
+                        listUser.forEach(user->{
+                            if(user.getCodecheckin()==i.getCodecheckin()){
+                                String content1 = "check out som" + format.format(i.getTimecheckout());
+                                listUser.remove(user);
+                                SendMailCheckinLate(user,content1);
+                            }
+                        });
                     }
                 }
 

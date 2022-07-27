@@ -1,7 +1,6 @@
 package com.example.manageemployee.webConfig.securityConfig;
 
-import com.example.manageemployee.jwt.JwtEntryPoint;
-import com.example.manageemployee.jwt.JwtTokenFilter;
+import com.example.manageemployee.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,10 +9,14 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import javax.sql.DataSource;
 @Configuration
+@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -23,11 +26,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     DataSource dataSource;
     @Autowired
     UserDetailsService userDetailsService;
-    @Autowired
-    JwtEntryPoint jwtEntryPoint;
+
+
     @Bean
-    public JwtTokenFilter jwtTokenFilter(){
-        return new JwtTokenFilter();
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter();
     }
     @Bean
     public AuthenticationManager authenticationManager() throws Exception{
@@ -40,23 +43,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/home","/login","/logout","/test","/admin/**","/checkin/**").permitAll();
-
-//        http.authorizeRequests()
-//                //.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
-//                .antMatchers("/checkin/**").access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_ADMIN')");
-
-        http.authorizeRequests().and().exceptionHandling().accessDeniedPage("/login");
-
-        http.formLogin().loginPage("/login")
-                .defaultSuccessUrl("/login?successfully")//đây Khi đăng nhập thành công thì vào trang này. userAccountInfo sẽ được khai báo trong controller để hiển thị trang view tương ứng
-                .failureUrl("/login?error=true")
-                .usernameParameter("username")
-                .passwordParameter("password")
-                .and()
-                .logout().permitAll();
-
-        http.csrf().disable();
+                .antMatchers( "/login","/register").permitAll()
+                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+                .antMatchers("/checkin/**").access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_ADMIN')")
+                .anyRequest().authenticated()
+                .and().csrf().disable();
     }
 
 }

@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @SpringBootApplication
 @EnableScheduling
-@EnableWebSecurity
 public class ManageEmployeeApplication {
     public static void main(String[] args) {
         SpringApplication.run(ManageEmployeeApplication.class, args);

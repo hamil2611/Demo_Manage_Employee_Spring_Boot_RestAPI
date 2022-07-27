@@ -12,8 +12,8 @@ import java.util.Collection;
 @Getter
 @Setter
 public class JwtResponse {
-    String token;
+    private String token;
     private String type = "Bearer";
-    private String name;
+    private String username;
     private Collection<? extends GrantedAuthority> roles;
 }
