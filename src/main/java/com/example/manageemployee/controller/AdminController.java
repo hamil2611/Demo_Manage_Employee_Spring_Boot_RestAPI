@@ -3,13 +3,17 @@ package com.example.manageemployee.controller;
 import com.example.manageemployee.model.dto.RoleDto;
 import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.model.entity.ReportCheckin;
+import com.example.manageemployee.model.enummodel.EnumStatus;
 import com.example.manageemployee.service.checkinDAOService.CheckinDAOServiceImpl;
 import com.example.manageemployee.service.userDAOService.UserDAOServiceImpl;
+import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @RestController
@@ -21,25 +25,17 @@ public class AdminController {
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     CheckinDAOServiceImpl checkinDAOServiceImpl;
-    //ModelAttribute
-    @ModelAttribute("userDto")
-    public UserDto userDto() {
-        return new UserDto();
-    }
-    @ModelAttribute("roledto")
-    public RoleDto roleDto() {
-        return new RoleDto();
-    }
 
     //HTTP Method
     @GetMapping("/viewemployee")
     public List<UserDto> viewEmployee(){
-        List<UserDto> listUserDto = userDAOServiceImpl.findAllEmployee();
-        listUserDto.forEach(i-> System.out.println(i.getFullname()));
-        return listUserDto;
+        UserPrinciple userPrinciple = (UserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println(userPrinciple.getPassword());
+        List<UserDto> userDtoList = userDAOServiceImpl.findAllEmployee();
+        return userDtoList;
     }
-    @GetMapping("/viewemployee/detail")
-    public UserDto viewEmployee(@RequestParam int id){
+    @GetMapping("/viewemployee/detail/{id}")
+    public UserDto viewEmployee(@PathVariable int id) {
         UserDto userDto = userDAOServiceImpl.getUser(id);
         return userDto;
     }
@@ -61,7 +57,7 @@ public class AdminController {
         }
     }
     @DeleteMapping("/deleteuser")
-    public String deleteUser(@RequestParam int id, Model model){
+    public String deleteUser(@RequestParam int id){
         if(userDAOServiceImpl.deleteUser(id)){
             return "Delete User Successfully!";
         }
@@ -76,5 +72,68 @@ public class AdminController {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+    @PostMapping("/search")
+    public List<UserDto> SearchEmployee(@RequestParam String name){
+        if(name.equals(""))
+            return null;
+        List<UserDto> userDtoList = userDAOServiceImpl.findUserByName(name);
+        return userDtoList;
+    }
+    //viewcheckin employee default week
+    @GetMapping("/viewreportcheckin/{codecheckin}")
+    public List<ReportCheckin> ViewCheckin(@PathVariable int codecheckin){
+        Calendar calendar = Calendar.getInstance();
+        int weekofyear = calendar.get(Calendar.WEEK_OF_YEAR);
+        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.findReportCheckinByCodecheckin(codecheckin);
+        if (reportCheckinList.isEmpty()){
+            System.out.println("null");
+            return null;
+        }
+        List<ReportCheckin> reportCheckinWeekNowList = new ArrayList<>();
+        reportCheckinList.forEach(reportCheckin -> {
+            if (reportCheckin.getCheckin().getWeekofyear()==weekofyear) {
+                reportCheckinWeekNowList.add(reportCheckin);
+            }
+        });
+        return reportCheckinWeekNowList;
+    }
+    @PostMapping("/viewreportcheckin/{codecheckin}")
+    public List<ReportCheckin> ViewCheckin(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin ){
+        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.ShowReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(), codecheckin);
+        return reportCheckinList;
+    }
+    //viewfault checkin employee
+    @GetMapping("/fault/{codecheckin}")
+    public List<ReportCheckin> ShowFaultCheckinDefault(@PathVariable int codecheckin){
+        Calendar calendar = Calendar.getInstance();
+        int monthofyear = calendar.get(Calendar.MONTH)+1;
+        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.findReportCheckinByCodecheckin(codecheckin);
+        if (reportCheckinList.isEmpty()){
+            System.out.println("null");
+            return null;
+        }
+        List<ReportCheckin> faultCheckinList = new ArrayList<>();
+        reportCheckinList.forEach(reportCheckin -> {
+            if (reportCheckin.getCheckin().getMonthofyear()==monthofyear&&reportCheckin.getStatus().equals(EnumStatus.NOTOK)) {
+                faultCheckinList.add(reportCheckin);
+            }
+        });
+        return faultCheckinList;
+    }
+    @PostMapping("/fault/{codecheckin}")
+    public List<ReportCheckin> ShowFaultCheckinDefault(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin){
+        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.ShowReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(),codecheckin);
+        if (reportCheckinList.isEmpty()){
+            System.out.println("null");
+            return null;
+        }
+        List<ReportCheckin> faultCheckinList = new ArrayList<>();
+        reportCheckinList.forEach(reportCheckin -> {
+            if (reportCheckin.getStatus().equals(EnumStatus.NOTOK)) {
+                faultCheckinList.add(reportCheckin);
+            }
+        });
+        return faultCheckinList;
     }
 }

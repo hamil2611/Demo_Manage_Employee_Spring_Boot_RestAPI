@@ -1,9 +1,7 @@
 package com.example.manageemployee.jwt;
 
 import com.example.manageemployee.webConfig.securityConfig.IUserDetailsServiceImpl;
-import com.example.manageemployee.webConfig.securityConfig.UserDetailsServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,12 +28,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String jwt = getJwtFromRequest(request);
+            System.out.println("Token "+jwt);
             if (jwt != null && jwtService.validateJwtToken(jwt)) {
+                System.out.println("Solve if jwt not null!");
                 String username = jwtService.getUserNameFromJwtToken(jwt);
                 UserDetails userDetails = userService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UserPrinciple userPrinciple =(UserPrinciple) authentication.getPrincipal();
+                System.out.println("doFilter Test ContextHolder: "+ userPrinciple.getUsername());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
@@ -45,7 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
     private String getJwtFromRequest(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.replace("Bearer ", "");
         }

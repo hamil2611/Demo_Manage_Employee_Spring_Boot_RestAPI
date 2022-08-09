@@ -1,24 +1,20 @@
 package com.example.manageemployee.service.userDAOService;
 
 import com.example.manageemployee.model.dto.CheckinDto;
+import com.example.manageemployee.model.dto.OnLeaveDto;
 import com.example.manageemployee.model.dto.UserDto;
-import com.example.manageemployee.model.entity.Checkin;
-import com.example.manageemployee.model.entity.Role;
-import com.example.manageemployee.model.entity.User;
-import com.example.manageemployee.repository.CheckinRepository;
-import com.example.manageemployee.repository.RoleRepository;
-import com.example.manageemployee.repository.UserRepository;
+import com.example.manageemployee.model.entity.*;
+import com.example.manageemployee.repository.*;
 import com.example.manageemployee.service.mailService.MailService;
 import com.example.manageemployee.service.roleDAOService.RoleDAOServiceImpl;
+import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -30,6 +26,10 @@ public class UserDAOServiceImpl implements  UserDAOService{
     RoleRepository roleRepository;
     @Autowired
     CheckinRepository checkinRepository;
+    @Autowired
+    OnLeaveRepository onLeaveRepository;
+    @Autowired
+    ProjectRepository projectRepository;
     @Autowired
     ModelMapper modelMapper;
     @Autowired
@@ -47,11 +47,11 @@ public class UserDAOServiceImpl implements  UserDAOService{
         }
         Date date = new Date();
         int codeCheckin=0;
-        List<Integer> listCodeCheckin = userRepository.findAllCodecheckin();
+        List<Integer> codeCheckinList = userRepository.findAllCodecheckin();
         while(true){
             int tmp=0;
             codeCheckin = ThreadLocalRandom.current().nextInt(1000,10000);
-            for(Integer i:listCodeCheckin){
+            for(Integer i:codeCheckinList){
                 if(i==codeCheckin){
                     tmp++;
                     break;
@@ -83,7 +83,6 @@ public class UserDAOServiceImpl implements  UserDAOService{
     @Override
     public List<UserDto> findAllEmployee() {
         List<User> listEmployee= userRepository.findAllEmployee();
-        listEmployee.forEach(i-> System.out.println(i.getUsername()));
         List<UserDto> listUserDto = listEmployee.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
         return listUserDto;
     }
@@ -155,7 +154,42 @@ public class UserDAOServiceImpl implements  UserDAOService{
         System.out.println(userDto.getFullname());
         return userDto;
     }
-    public List<User> getUserByUsername(String username){
-        return userRepository.findAllByUsername(username);
+
+    @Override
+    public List<UserDto> findUserByName(String name) {
+        List<User> userList = userRepository.findUserByFullname(name);
+        List<UserDto> userDtoList = userList.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
+        return userDtoList;
+    }
+
+    @Override
+    public boolean SendRequestOnLeave(OnLeaveDto onLeaveDto) {
+        UserPrinciple userPrinciple = (UserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByUsername(userPrinciple.getUsername());
+        OnLeave onLeave = this.modelMapper.map(onLeaveDto,OnLeave.class);
+        System.out.println(onLeave.getDurationonleave());
+        onLeave.setUser(user);
+        onLeaveRepository.save(onLeave);
+        return true;
+    }
+    @Override
+    public int getCodecheckinByUsername() {
+        UserPrinciple userPrinciple = (UserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByUsername(userPrinciple.getUsername());
+        return user.getCodecheckin();
+    }
+
+    @Override
+    public boolean joinPorject(int userid, int projectid) {
+        System.out.println("test1");
+        Optional<User> userOptional = userRepository.findById(userid);
+        Optional<Project> projectOptional = projectRepository.findById(projectid);
+        User user = this.modelMapper.map(userOptional,User.class);
+        Project project = this.modelMapper.map(projectOptional,Project.class);
+        Set<Project> projectSet = new HashSet<>();
+        projectSet.add(project);
+        user.setProjects(projectSet);
+        userRepository.save(user);
+        return false;
     }
 }

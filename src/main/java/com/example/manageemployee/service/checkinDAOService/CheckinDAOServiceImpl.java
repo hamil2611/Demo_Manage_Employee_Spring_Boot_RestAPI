@@ -2,29 +2,31 @@ package com.example.manageemployee.service.checkinDAOService;
 
 import com.example.manageemployee.model.entity.Checkin;
 import com.example.manageemployee.model.entity.ReportCheckin;
+import com.example.manageemployee.model.entity.User;
 import com.example.manageemployee.model.enummodel.EnumReport;
 import com.example.manageemployee.model.enummodel.EnumStatus;
 import com.example.manageemployee.repository.CheckinRepository;
 import com.example.manageemployee.repository.ReportCheckinRepository;
+import com.example.manageemployee.repository.UserRepository;
+import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.text.SimpleDateFormat;;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @PropertySources({@PropertySource("classpath:application-email.yml"),@PropertySource("classpath:application-cron.yml")})
-public class CheckinDAOServiceImpl implements CheckinDAOService{
+public class    CheckinDAOServiceImpl implements CheckinDAOService{
     @Autowired
     CheckinRepository checkinRepository;
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     ReportCheckinRepository reportCheckinRepository;
     @Autowired
@@ -120,9 +122,10 @@ public class CheckinDAOServiceImpl implements CheckinDAOService{
     }
 
     @Override
-    public List<ReportCheckin> ShowReportCheckinByMonth() {
-
-        return null;
+    public List<ReportCheckin> ShowReportCheckinByTime(Date startDate, Date endDate,int codecheckin) {
+        List<ReportCheckin> reportCheckinList = reportCheckinRepository.findReportCheckinByTime(startDate,endDate,codecheckin);
+        System.out.println("Size reportcheckin: "+reportCheckinList.size());
+        return reportCheckinList;
     }
 
 }

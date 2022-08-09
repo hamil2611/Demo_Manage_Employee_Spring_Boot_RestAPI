@@ -8,8 +8,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +23,7 @@ public class UserDetailsServiceImpl implements IUserDetailsServiceImpl {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<User> users = this.getUser(username);
+        System.out.println("loadUser");
         if(users.isEmpty())//Check username
             throw  new UsernameNotFoundException("User does not exist");
         User user = users.get(0);

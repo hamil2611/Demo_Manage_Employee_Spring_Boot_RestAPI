@@ -1,15 +1,12 @@
 package com.example.manageemployee.jwt;
 
-import com.example.manageemployee.webConfig.securityConfig.UserDetailsServiceImpl;
 import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import java.util.Date;
 @Component
 @Service
@@ -24,7 +21,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + EXPIRE_TIME * 1000))
+                .setExpiration(new Date((new Date()).getTime() + 30000))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
