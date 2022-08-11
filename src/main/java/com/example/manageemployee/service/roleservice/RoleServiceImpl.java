@@ -1,4 +1,4 @@
-package com.example.manageemployee.service.roleDAOService;
+package com.example.manageemployee.service.roleservice;
 
 import com.example.manageemployee.model.dto.RoleDto;
 import com.example.manageemployee.model.entity.Role;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 @Service
-public class RoleDAOServiceImpl implements  RoleDAOService{
+public class RoleServiceImpl implements RoleService {
     @Autowired
     RoleRepository roleRepository;
     @Autowired

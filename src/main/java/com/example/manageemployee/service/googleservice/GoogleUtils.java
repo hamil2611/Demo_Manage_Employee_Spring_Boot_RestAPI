@@ -1,4 +1,4 @@
-package com.example.manageemployee.Test;
+package com.example.manageemployee.service.googleservice;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +20,12 @@ public class GoogleUtils {
     private Environment env;
     public String getToken(final String code) throws ClientProtocolException, IOException {
         String link = env.getProperty("google.link.get.token");
+        System.out.println("(Method getToken)" + link );
         String response = Request.Post(link)
                 .bodyForm(Form.form().add("client_id", env.getProperty("google.app.id"))
                         .add("client_secret", env.getProperty("google.app.secret"))
-                        .add("redirect_uri", env.getProperty("google.redirect.uri")).add("code", code)
+                        .add("redirect_uri", env.getProperty("google.redirect.uri"))
+                        .add("code", code)
                         .add("grant_type", "authorization_code").build())
                 .execute().returnContent().asString();
         ObjectMapper mapper = new ObjectMapper();

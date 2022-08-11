@@ -2,13 +2,11 @@ package com.example.manageemployee.controller;
 
 
 import com.example.manageemployee.model.dto.OnLeaveDto;
-import com.example.manageemployee.model.entity.OnLeave;
 import com.example.manageemployee.model.entity.ReportCheckin;
 import com.example.manageemployee.model.enummodel.EnumDurationOnleave;
 import com.example.manageemployee.model.enummodel.EnumStatus;
-import com.example.manageemployee.service.checkinDAOService.CheckinDAOServiceImpl;
-import com.example.manageemployee.service.userDAOService.UserDAOServiceImpl;
-import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
+import com.example.manageemployee.service.checkinservice.CheckinServiceImpl;
+import com.example.manageemployee.service.userservice.UserServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,11 +22,11 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
-    UserDAOServiceImpl userDAOServiceImpl;
+    UserServiceImpl userDAOServiceImpl;
     @Autowired
-    CheckinDAOServiceImpl checkinDAOServiceImpl;
+    CheckinServiceImpl checkinDAOServiceImpl;
     @GetMapping("/viewcheckin")
-    public List<ReportCheckin> ViewCheckin(){
+    public List<ReportCheckin> viewCheckin(){
         Calendar calendar = Calendar.getInstance();
         int weekofyear = calendar.get(Calendar.WEEK_OF_YEAR);
         List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.findReportCheckinByCodecheckin(userDAOServiceImpl.getCodecheckinByUsername());
@@ -45,12 +43,12 @@ public class UserController {
         return reportCheckinWeekNowList;
     }
     @PostMapping("/viewcheckin")
-    public List<ReportCheckin> ViewCheckin(@RequestBody SortByTime sortByTime ){
+    public List<ReportCheckin> viewCheckin(@RequestBody SortByTime sortByTime ){
         List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.ShowReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(), userDAOServiceImpl.getCodecheckinByUsername());
         return reportCheckinList;
     }
     @GetMapping("/fault")
-    public List<ReportCheckin> ShowFaultCheckinDefault(){
+    public List<ReportCheckin> showFaultCheckinDefault(){
         Calendar calendar = Calendar.getInstance();
         int monthofyear = calendar.get(Calendar.MONTH)+1;
         List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.findReportCheckinByCodecheckin(userDAOServiceImpl.getCodecheckinByUsername());
@@ -67,7 +65,7 @@ public class UserController {
         return faultCheckinList;
     }
     @PostMapping("/fault")
-    public List<ReportCheckin> ShowFaultCheckinDefault(@RequestBody SortByTime sortByTime){
+    public List<ReportCheckin> showFaultCheckinDefault(@RequestBody SortByTime sortByTime){
         List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.ShowReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(), userDAOServiceImpl.getCodecheckinByUsername());
         if (reportCheckinList.isEmpty()){
             System.out.println("null");
@@ -82,12 +80,12 @@ public class UserController {
         return faultCheckinList;
     }
     @PostMapping("/myonleave")
-    public boolean SendOnLeave(@RequestBody OnLeaveDto onLeaveDto){
+    public boolean sendOnLeave(@RequestBody OnLeaveDto onLeaveDto){
         Date date = new Date();
         System.out.println(EnumDurationOnleave.WEEK);
         onLeaveDto.setDurationonleave(EnumDurationOnleave.WEEK);
         System.out.println(onLeaveDto.getDurationonleave());
-        System.out.println(userDAOServiceImpl.SendRequestOnLeave(onLeaveDto));
+        System.out.println(userDAOServiceImpl.sendRequestOnLeave(onLeaveDto));
         return false;
     }
 }

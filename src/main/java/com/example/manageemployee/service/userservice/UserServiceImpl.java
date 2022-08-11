@@ -1,12 +1,12 @@
-package com.example.manageemployee.service.userDAOService;
+package com.example.manageemployee.service.userservice;
 
 import com.example.manageemployee.model.dto.CheckinDto;
 import com.example.manageemployee.model.dto.OnLeaveDto;
 import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.model.entity.*;
 import com.example.manageemployee.repository.*;
-import com.example.manageemployee.service.mailService.MailService;
-import com.example.manageemployee.service.roleDAOService.RoleDAOServiceImpl;
+import com.example.manageemployee.service.mailservice.MailService;
+import com.example.manageemployee.service.roleservice.RoleServiceImpl;
 import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
-public class UserDAOServiceImpl implements  UserDAOService{
+public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -35,16 +35,16 @@ public class UserDAOServiceImpl implements  UserDAOService{
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
-    RoleDAOServiceImpl roleDAOServiceImpl;
+    RoleServiceImpl roleDAOServiceImpl;
     @Autowired
     MailService mailService;
     @Override
     public boolean addUser(UserDto userDto) {
-        User u = this.modelMapper.map(userDto,User.class);
-        List<User> userCheckUsername = userRepository.findAllByUsername(u.getUsername());
+        List<User> userCheckUsername = userRepository.findAllByUsername(userDto.getUsername());
         if(!userCheckUsername.isEmpty()){
             return false;
         }
+        User u = this.modelMapper.map(userDto,User.class);
         Date date = new Date();
         int codeCheckin=0;
         List<Integer> codeCheckinList = userRepository.findAllCodecheckin();
@@ -67,7 +67,6 @@ public class UserDAOServiceImpl implements  UserDAOService{
         userRepository.save(u);
         return true;
     }
-
     @Override
     public boolean updateUser(UserDto userDto) {
         if(!userRepository.findById(userDto.getId()).isEmpty()){
@@ -154,7 +153,6 @@ public class UserDAOServiceImpl implements  UserDAOService{
         System.out.println(userDto.getFullname());
         return userDto;
     }
-
     @Override
     public List<UserDto> findUserByName(String name) {
         List<User> userList = userRepository.findUserByFullname(name);
@@ -163,7 +161,7 @@ public class UserDAOServiceImpl implements  UserDAOService{
     }
 
     @Override
-    public boolean SendRequestOnLeave(OnLeaveDto onLeaveDto) {
+    public boolean sendRequestOnLeave(OnLeaveDto onLeaveDto) {
         UserPrinciple userPrinciple = (UserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByUsername(userPrinciple.getUsername());
         OnLeave onLeave = this.modelMapper.map(onLeaveDto,OnLeave.class);
@@ -191,5 +189,18 @@ public class UserDAOServiceImpl implements  UserDAOService{
         user.setProjects(projectSet);
         userRepository.save(user);
         return false;
+    }
+
+    @Override
+    public List<Role> getRoles() {
+        List<Role> roleList =  roleRepository.findAll();
+        return roleList;
+    }
+
+    @Override
+    public UserDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        UserDto userDto = this.modelMapper.map(user,UserDto.class);
+        return userDto;
     }
 }

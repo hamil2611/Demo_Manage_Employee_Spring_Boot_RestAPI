@@ -1,4 +1,4 @@
-package com.example.manageemployee.service.mailService;
+package com.example.manageemployee.service.mailservice;
 
 import com.example.manageemployee.model.entity.Checkin;
 import com.example.manageemployee.model.entity.User;
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
-import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -32,8 +32,8 @@ public class MailService {
     @Autowired
     CheckinRepository checkinRepository;
     @Autowired
-    private ConfigurableEnvironment env;
-    @Value("${scheduled.cronjob}")
+    private Environment env;
+    @Value("${cron.report}")
     private String cronjob;
 ;
     public void SendMailCheckinLate(User user,String content){
@@ -60,7 +60,7 @@ public class MailService {
         helper.setText("You have successfully registered and logged in.");
         mailSender.send(mimeMessage);
     }
-    @Scheduled(cron ="${scheduled.cronjob}")
+    @Scheduled(cron ="${cron.report}")
     public void scheduleTaskUsingCronExpression() throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat formatDatecreated = new SimpleDateFormat("yyyy-MM-dd");

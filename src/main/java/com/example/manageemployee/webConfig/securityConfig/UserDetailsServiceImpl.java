@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements IUserDetailsServiceImpl {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<User> users = this.getUser(username);
-        System.out.println("loadUser");
+        System.out.println("loadUserByUsername");
         if(users.isEmpty())//Check username
             throw  new UsernameNotFoundException("User does not exist");
         User user = users.get(0);

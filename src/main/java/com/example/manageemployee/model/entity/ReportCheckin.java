@@ -30,6 +30,7 @@ public class ReportCheckin implements Serializable {
     private String Complain;
     @Enumerated(EnumType.STRING)
     private EnumStatus status;
+
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="checkin_id")
     private Checkin checkin;

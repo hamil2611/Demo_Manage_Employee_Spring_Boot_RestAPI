@@ -1,1 +1,1 @@
-cron.report: "30 44 10 * * ?"
+cron.report: "00 20 11 * * ?"

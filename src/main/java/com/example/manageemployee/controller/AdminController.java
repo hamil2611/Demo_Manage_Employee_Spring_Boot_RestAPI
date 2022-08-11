@@ -1,15 +1,25 @@
 package com.example.manageemployee.controller;
 
-import com.example.manageemployee.model.dto.RoleDto;
+import com.example.manageemployee.model.ProjectionInterface.IUserProjection;
 import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.model.entity.ReportCheckin;
+import com.example.manageemployee.model.entity.Role;
+import com.example.manageemployee.model.entity.User;
 import com.example.manageemployee.model.enummodel.EnumStatus;
-import com.example.manageemployee.service.checkinDAOService.CheckinDAOServiceImpl;
-import com.example.manageemployee.service.userDAOService.UserDAOServiceImpl;
+import com.example.manageemployee.repository.CheckinRepository;
+import com.example.manageemployee.repository.UserRepository;
+import com.example.manageemployee.service.checkinservice.CheckinServiceImpl;
+import com.example.manageemployee.service.userservice.UserServiceImpl;
 import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -18,21 +28,24 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
-    @Autowired
-    UserDAOServiceImpl userDAOServiceImpl;
-    @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
-    @Autowired
-    CheckinDAOServiceImpl checkinDAOServiceImpl;
-
+    private final UserServiceImpl userDAOServiceImpl;
+    private final CheckinServiceImpl checkinDAOServiceImpl;
     //HTTP Method
     @GetMapping("/viewemployee")
-    public List<UserDto> viewEmployee(){
+    public ResponseEntity<List<UserDto>> viewEmployee(){
         UserPrinciple userPrinciple = (UserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         System.out.println(userPrinciple.getPassword());
         List<UserDto> userDtoList = userDAOServiceImpl.findAllEmployee();
-        return userDtoList;
+        System.out.println("***Before Return List (FETCH EAGER)***");
+        return ResponseEntity.status(HttpStatus.OK).body(userDtoList);
+    }
+    @GetMapping("/viewrole")
+    public ResponseEntity<List<Role>> viewRole(){
+        List<Role> roleList = userDAOServiceImpl.getRoles();
+        System.out.println("***Before Return List (FETCH LAZY)***");
+        return new ResponseEntity<>(roleList,HttpStatus.OK);
     }
     @GetMapping("/viewemployee/detail/{id}")
     public UserDto viewEmployee(@PathVariable int id) {
@@ -105,7 +118,7 @@ public class AdminController {
     }
     //viewfault checkin employee
     @GetMapping("/fault/{codecheckin}")
-    public List<ReportCheckin> ShowFaultCheckinDefault(@PathVariable int codecheckin){
+    public ResponseEntity<List<ReportCheckin>> ShowFaultCheckinDefault(@PathVariable int codecheckin){
         Calendar calendar = Calendar.getInstance();
         int monthofyear = calendar.get(Calendar.MONTH)+1;
         List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.findReportCheckinByCodecheckin(codecheckin);
@@ -119,7 +132,7 @@ public class AdminController {
                 faultCheckinList.add(reportCheckin);
             }
         });
-        return faultCheckinList;
+        return ResponseEntity.ok(faultCheckinList);
     }
     @PostMapping("/fault/{codecheckin}")
     public List<ReportCheckin> ShowFaultCheckinDefault(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin){
@@ -135,5 +148,34 @@ public class AdminController {
             }
         });
         return faultCheckinList;
+    }
+
+
+    //Test
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    CheckinRepository checkinRepository;
+    @GetMapping("/userprojection")
+    public List<IUserProjection> getUserPorjection(){
+        List<IUserProjection> userProjectionList = userRepository.findBy(IUserProjection.class);
+        return userProjectionList;
+    }
+
+    @GetMapping("/findallsort")
+    public List<User> findAllSort(){
+        Sort sort =Sort.by("id").descending();
+        List<User> userList = userRepository.findAllSort(sort);
+        return userList;
+    }
+    @GetMapping("/findallpage")
+    public Page<User> findAllPage(){
+        Pageable pageable = PageRequest.of(1, 2);
+        Page<User> userPage = userRepository.findAllPage(pageable);
+        return userPage;
+    }
+    @DeleteMapping("/deletecheckin/{id}")
+    public void deleteCheckin(@PathVariable int id ){
+        checkinRepository.deleteById(id);
     }
 }

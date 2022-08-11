@@ -1,5 +1,6 @@
 package com.example.manageemployee.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
+
 @Entity
 @Table
 @NoArgsConstructor
@@ -26,4 +29,7 @@ public class Checkin implements Serializable {
     private int weekofyear;
     private int monthofyear;
     private int year;
+    @OneToOne(mappedBy = "checkin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private ReportCheckin reportCheckin;
 }

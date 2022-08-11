@@ -1,19 +1,16 @@
-package com.example.manageemployee.service.checkinDAOService;
+package com.example.manageemployee.service.checkinservice;
 
 import com.example.manageemployee.model.entity.Checkin;
 import com.example.manageemployee.model.entity.ReportCheckin;
-import com.example.manageemployee.model.entity.User;
 import com.example.manageemployee.model.enummodel.EnumReport;
 import com.example.manageemployee.model.enummodel.EnumStatus;
 import com.example.manageemployee.repository.CheckinRepository;
 import com.example.manageemployee.repository.ReportCheckinRepository;
 import com.example.manageemployee.repository.UserRepository;
-import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;;
@@ -22,7 +19,7 @@ import java.util.List;
 
 @Service
 @PropertySources({@PropertySource("classpath:application-email.yml"),@PropertySource("classpath:application-cron.yml")})
-public class    CheckinDAOServiceImpl implements CheckinDAOService{
+public class CheckinServiceImpl implements CheckinService {
     @Autowired
     CheckinRepository checkinRepository;
     @Autowired

@@ -1,4 +1,4 @@
-package com.example.manageemployee.service.checkinDAOService;
+package com.example.manageemployee.service.checkinservice;
 
 import com.example.manageemployee.model.entity.Checkin;
 import com.example.manageemployee.model.entity.ReportCheckin;
@@ -8,7 +8,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
-public interface CheckinDAOService {
+public interface CheckinService {
     public List<ReportCheckin> findReportCheckinByCodecheckin(int codecheckin);
     public List<Checkin> findAll();
     public List<Checkin> ShowReportCheckin();

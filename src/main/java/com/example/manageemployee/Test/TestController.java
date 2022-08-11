@@ -1,17 +1,15 @@
 package com.example.manageemployee.Test;
 
 import com.example.manageemployee.jwt.JwtService;
+import com.example.manageemployee.model.ProjectionInterface.IUserProjection;
 import com.example.manageemployee.model.entity.User;
 import com.example.manageemployee.repository.RoleRepository;
 import com.example.manageemployee.repository.UserRepository;
-import com.example.manageemployee.service.checkinDAOService.CheckinDAOServiceImpl;
-import com.example.manageemployee.service.roleDAOService.RoleDAOServiceImpl;
-import com.example.manageemployee.service.userDAOService.UserDAOServiceImpl;
+import com.example.manageemployee.service.checkinservice.CheckinServiceImpl;
+import com.example.manageemployee.service.roleservice.RoleServiceImpl;
+import com.example.manageemployee.service.userservice.UserServiceImpl;
 import com.example.manageemployee.webConfig.securityConfig.IUserDetailsServiceImpl;
 import com.example.manageemployee.webConfig.securityConfig.UserDetailsServiceImpl;
-import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,23 +17,11 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 class UserThread extends Thread {
@@ -53,9 +39,9 @@ class UserThread extends Thread {
 @RestController
 public class TestController {
     @Autowired
-    RoleDAOServiceImpl roleDAOServiceImpl;
+    RoleServiceImpl roleDAOServiceImpl;
     @Autowired
-    CheckinDAOServiceImpl checkinDAOServiceImpl;
+    CheckinServiceImpl checkinDAOServiceImpl;
     @Autowired
     UserRepository userRepository;
     //@Scheduled(fixedRateString= "20000", initialDelay = 10000)
@@ -87,11 +73,12 @@ public class TestController {
     @Autowired
     RoleRepository roleRepository;
     @Autowired
-    UserDAOServiceImpl userDAOServiceImpl;
+    UserServiceImpl userDAOServiceImpl;
 
-    @PostMapping("/test")
+    @GetMapping("/test")
     public void Test(){
-        userDAOServiceImpl.joinPorject(40,1);
+        userRepository.findBy(IUserProjection.class);
+
     }
     @GetMapping("/getuser")
     public List<User> getRoles(){
@@ -106,43 +93,8 @@ public class TestController {
         ResponseEntity<Todos> todos = restTemplate.getForEntity(url + id, Todos.class);
         return todos.getBody();
     }
-    private static final String SECRET_KEY = "123456789";
-    private static final long EXPIRE_TIME = 86400000000L;
-    @Autowired
-    GoogleUtils googleUtils;
-    @Autowired
-    private IUserDetailsServiceImpl userService;
-    @RequestMapping("/loginwithgoogle")
-    public String loginGoogle(HttpServletRequest request) throws IOException {
-        String code = request.getParameter("code");
-//        if (code == null || code.isEmpty()) {
-//            return "redirect:/login?google=error";
-//        }
-        System.out.println("Code login with google:" + code);
-        String accessToken = googleUtils.getToken(code);
-        System.out.println("Get Token Complete!");
-        GooglePojo googlePojo = googleUtils.getUserInfo(accessToken);
-        System.out.println("Get UserInfo Complete!");
-        UserDetails userDetail = googleUtils.buildUser(googlePojo);
-        System.out.println("Get buildUser Complete!");
-        System.out.println("loginGoogle" + userDetail.getUsername());
-        User user = userRepository.findByEmail(googlePojo.getEmail());
-        String jwt = Jwts.builder()
-                .setSubject((user.getUsername()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + 30000))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .compact();
-        System.out.println(jwt);
-        UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        UserPrinciple userPrinciple =(UserPrinciple) authentication.getPrincipal();
-        System.out.println("doFilter Test ContextHolder: "+ userPrinciple.getUsername());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return userPrinciple.getUsername();
-    }
+
+
 
 }
 @Getter

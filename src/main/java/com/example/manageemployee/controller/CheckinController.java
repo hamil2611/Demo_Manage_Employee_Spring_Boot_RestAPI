@@ -2,9 +2,9 @@ package com.example.manageemployee.controller;
 
 import com.example.manageemployee.model.dto.CheckinDto;
 import com.example.manageemployee.model.dto.UserDto;
-import com.example.manageemployee.service.checkinDAOService.CheckinDAOServiceImpl;
-import com.example.manageemployee.service.mailService.MailService;
-import com.example.manageemployee.service.userDAOService.UserDAOServiceImpl;
+import com.example.manageemployee.service.checkinservice.CheckinServiceImpl;
+import com.example.manageemployee.service.mailservice.MailService;
+import com.example.manageemployee.service.userservice.UserServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class CheckinController {
     @Autowired
-    UserDAOServiceImpl userDAOServiceImpl;
+    UserServiceImpl userDAOServiceImpl;
     @Autowired
-    CheckinDAOServiceImpl checkinDAOServiceImpl;
+    CheckinServiceImpl checkinDAOServiceImpl;
     @Autowired
     MailService mailController;
     @Autowired

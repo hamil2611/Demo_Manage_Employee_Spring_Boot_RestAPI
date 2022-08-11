@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -26,7 +29,10 @@ public class User implements Serializable {
     private String fullname;
     private String dateofbirth;
     private String address;
-    private String username,password;
+    private String username;
+    @NotEmpty(message = "Thiếu password")
+    private String password;
+    @Email(message = "Email khong hop le!")
     private String email;
     private int codecheckin;
     private Date datecreated;

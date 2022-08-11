@@ -23,6 +23,7 @@ public class Role implements Serializable {
     @Column(name="name")
     private String name;
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<User> users;
     public Set<User> getUsers(){
         return users;

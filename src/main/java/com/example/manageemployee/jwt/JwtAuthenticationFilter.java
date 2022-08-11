@@ -18,26 +18,25 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
-
     @Autowired
     private IUserDetailsServiceImpl userService;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
             String jwt = getJwtFromRequest(request);
-            System.out.println("Token "+jwt);
+            System.out.println("(Method doFilter) Token: "+jwt);
             if (jwt != null && jwtService.validateJwtToken(jwt)) {
-                System.out.println("Solve if jwt not null!");
+                System.out.println("(Method doFilter) Solve if jwt not null!");
                 String username = jwtService.getUserNameFromJwtToken(jwt);
+                System.out.println("(Method doFilter): " + username);
                 UserDetails userDetails = userService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 UserPrinciple userPrinciple =(UserPrinciple) authentication.getPrincipal();
-                System.out.println("doFilter Test ContextHolder: "+ userPrinciple.getUsername());
+                System.out.println("(Method doFilter) Test ContextHolder: "+ userPrinciple.getUsername());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
