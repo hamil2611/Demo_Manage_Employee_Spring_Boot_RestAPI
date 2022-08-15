@@ -13,12 +13,6 @@ import org.springframework.web.bind.annotation.*;
 public class CheckinController {
     @Autowired
     UserServiceImpl userDAOServiceImpl;
-    @Autowired
-    CheckinServiceImpl checkinDAOServiceImpl;
-    @Autowired
-    MailService mailController;
-    @Autowired
-    ModelMapper modelMapper;
     @GetMapping("/checkin")
     public String employeeCheckin(){
         return "checkinform";

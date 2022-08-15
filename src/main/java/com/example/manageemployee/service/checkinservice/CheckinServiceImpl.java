@@ -11,9 +11,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -30,9 +33,31 @@ public class CheckinServiceImpl implements CheckinService {
     ModelMapper modelMapper;
 
     @Override
-    public List<ReportCheckin> findReportCheckinByCodecheckin(int codecheckin) {
+    public List<ReportCheckin> reportCheckin(int codecheckin) {
+        List<ReportCheckin> reportCheckinList = reportCheckinRepository.findReportcheckin(codecheckin);
+        Calendar calendar = Calendar.getInstance();
+        int weekofyear = calendar.get(Calendar.WEEK_OF_YEAR);
+        List<ReportCheckin> reportCheckinWeekNowList = new ArrayList<>();
+        reportCheckinList.forEach(reportCheckin -> {
+            if (reportCheckin.getCheckin().getWeekofyear()==weekofyear) {
+                reportCheckinWeekNowList.add(reportCheckin);
+            }
+        });
+        return reportCheckinWeekNowList;
+    }
+
+    @Override
+    public List<ReportCheckin> faultCheckin(int codecheckin) {
         List<ReportCheckin> listReportCheckin = reportCheckinRepository.findReportcheckin(codecheckin);
-        return listReportCheckin;
+        Calendar calendar = Calendar.getInstance();
+        int monthofyear = calendar.get(Calendar.MONTH)+1;
+        List<ReportCheckin> faultCheckinList = new ArrayList<>();
+        listReportCheckin.forEach(reportCheckin -> {
+            if (reportCheckin.getCheckin().getMonthofyear()==monthofyear&&reportCheckin.getStatus().equals(EnumStatus.NOTOK)) {
+                faultCheckinList.add(reportCheckin);
+            }
+        });
+        return faultCheckinList;
     }
 
     @Override
@@ -41,13 +66,13 @@ public class CheckinServiceImpl implements CheckinService {
     }
 
     @Override
-    public List<Checkin> ShowReportCheckin() {
+    public List<Checkin> showReportCheckin() {
         return null;
     }
     @Override
     //@Async
     //@Scheduled(cron ="${scheduled.cronjob}")
-    public List<ReportCheckin> StatisticsReportCheckin()  throws ParseException {
+    public List<ReportCheckin> statisticsReportCheckin()  throws ParseException {
         SimpleDateFormat formatDatecreated = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         Date dateToday = formatDatecreated.parse(formatDatecreated.format(new Date()));
@@ -119,10 +144,21 @@ public class CheckinServiceImpl implements CheckinService {
     }
 
     @Override
-    public List<ReportCheckin> ShowReportCheckinByTime(Date startDate, Date endDate,int codecheckin) {
+    public List<ReportCheckin> showReportCheckinByTime(Date startDate, Date endDate,int codecheckin) {
         List<ReportCheckin> reportCheckinList = reportCheckinRepository.findReportCheckinByTime(startDate,endDate,codecheckin);
-        System.out.println("Size reportcheckin: "+reportCheckinList.size());
         return reportCheckinList;
+    }
+
+    @Override
+    public List<ReportCheckin> showFaultCheckinByTime(Date startDate, Date endDate, int codecheckin) {
+        List<ReportCheckin> reportCheckinList = reportCheckinRepository.findReportCheckinByTime(startDate,endDate,codecheckin);
+        List<ReportCheckin> faultCheckinList = new ArrayList<>();
+        reportCheckinList.forEach(reportCheckin -> {
+            if (reportCheckin.getStatus().equals(EnumStatus.NOTOK)) {
+                faultCheckinList.add(reportCheckin);
+            }
+        });
+        return faultCheckinList;
     }
 
 }

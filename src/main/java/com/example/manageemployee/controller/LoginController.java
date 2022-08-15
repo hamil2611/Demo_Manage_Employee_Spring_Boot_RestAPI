@@ -5,6 +5,7 @@ import com.example.manageemployee.jwt.JwtService;
 import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.model.entity.User;
 import com.example.manageemployee.service.googleservice.GooglePojo;
+import com.example.manageemployee.service.googleservice.GoogleService;
 import com.example.manageemployee.service.googleservice.GoogleUtils;
 import com.example.manageemployee.service.mailservice.MailService;
 import com.example.manageemployee.service.userservice.UserServiceImpl;
@@ -36,6 +37,8 @@ public class LoginController {
     @Autowired
     UserServiceImpl userDAOServiceImpl;
     @Autowired
+    GoogleService googleService;
+    @Autowired
     MailService mailService;
     @Autowired
     ModelMapper modelMapper;
@@ -49,7 +52,7 @@ public class LoginController {
     public  String registerUser(@RequestBody UserDto udto) throws ParseException, MessagingException {
         if(userDAOServiceImpl.addUser(udto)){
             User user = this.modelMapper.map(udto,User.class);
-            mailService.SendMailFile(user);
+            mailService.sendMailFile(user);
             return "Add user successfully!";
         }
         else {
@@ -65,44 +68,14 @@ public class LoginController {
         System.out.println("testlogin");
         return ResponseEntity.ok(new JwtResponse(jwt,userDetails.getUsername(), userDetails.getPassword(),userDetails.getAuthorities() ));
     }
-    @Autowired
-    GoogleUtils googleUtils;
-    private static final String SECRET_KEY = "123456789";
-    private static final long EXPIRE_TIME = 86400000000L;
 
-    @Autowired
-    private IUserDetailsServiceImpl userService;
+
     @GetMapping("/loginwithgoogle")
-    public UserPrinciple loginGoogle(HttpServletRequest request) throws IOException {
-        String code = request.getParameter("code");
-//        if (code == null || code.isEmpty()) {
-//            return "redirect:/login?google=error";
-//        }
-        System.out.println("Code login with google:" + code);
-        String accessToken = googleUtils.getToken(code);
-        System.out.println("Get Token Complete!");
-        GooglePojo googlePojo = googleUtils.getUserInfo(accessToken);
-        System.out.println("Get UserInfo Complete!");
-        UserDetails userDetail = googleUtils.buildUser(googlePojo);
-        System.out.println("Get buildUser Complete!");
-        System.out.println("loginGoogle" + userDetail.getUsername());
-        UserDto userDto = userDAOServiceImpl.getUserByEmail(googlePojo.getEmail());
-        String jwt = Jwts.builder()
-                .setSubject((userDto.getUsername()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + 30000))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .compact();
-        UserDetails userDetails = userService.loadUserByUsername(userDto.getUsername());
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        UserPrinciple userPrinciple =(UserPrinciple) authentication.getPrincipal();
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return userPrinciple;
+    public ResponseEntity loginGoogle(HttpServletRequest request) throws IOException {
+       return ResponseEntity.ok(googleService.googleLogin(request));
     }
     @GetMapping("/logout")
-    public String logout(){
-        return null;
+    public ResponseEntity logout(){
+        return ResponseEntity.ok("LOGOUT");
     }
 }

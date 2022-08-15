@@ -40,10 +40,14 @@ public class UserServiceImpl implements UserService {
     MailService mailService;
     @Override
     public boolean addUser(UserDto userDto) {
-        List<User> userCheckUsername = userRepository.findAllByUsername(userDto.getUsername());
-        if(!userCheckUsername.isEmpty()){
+        User userCheckUsername = userRepository.findByUsername(userDto.getUsername());
+        if(userCheckUsername!=null)
             return false;
-        }
+
+        User userCheckEmail = userRepository.findByEmail(userDto.getEmail());
+        if(userCheckEmail!=null)
+            return false;
+
         User u = this.modelMapper.map(userDto,User.class);
         Date date = new Date();
         int codeCheckin=0;
@@ -78,7 +82,6 @@ public class UserServiceImpl implements UserService {
             return  false;
         }
     }
-
     @Override
     public List<UserDto> findAllEmployee() {
         List<User> listEmployee= userRepository.findAllEmployee();
@@ -102,7 +105,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
         return true;
     }
-
     @Override
     public UserDto getCheckinUser(int id) {
         Optional<User> user = userRepository.findById(id);
@@ -159,7 +161,6 @@ public class UserServiceImpl implements UserService {
         List<UserDto> userDtoList = userList.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
         return userDtoList;
     }
-
     @Override
     public boolean sendRequestOnLeave(OnLeaveDto onLeaveDto) {
         UserPrinciple userPrinciple = (UserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -176,7 +177,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(userPrinciple.getUsername());
         return user.getCodecheckin();
     }
-
     @Override
     public boolean joinPorject(int userid, int projectid) {
         System.out.println("test1");
@@ -200,6 +200,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email);
+        if (user==null)
+            return null;
         UserDto userDto = this.modelMapper.map(user,UserDto.class);
         return userDto;
     }

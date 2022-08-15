@@ -5,7 +5,6 @@ import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.model.entity.ReportCheckin;
 import com.example.manageemployee.model.entity.Role;
 import com.example.manageemployee.model.entity.User;
-import com.example.manageemployee.model.enummodel.EnumStatus;
 import com.example.manageemployee.repository.CheckinRepository;
 import com.example.manageemployee.repository.UserRepository;
 import com.example.manageemployee.service.checkinservice.CheckinServiceImpl;
@@ -22,8 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 @RestController
@@ -48,109 +45,82 @@ public class AdminController {
         return new ResponseEntity<>(roleList,HttpStatus.OK);
     }
     @GetMapping("/viewemployee/detail/{id}")
-    public UserDto viewEmployee(@PathVariable int id) {
+    public ResponseEntity<UserDto> viewEmployee(@PathVariable int id) {
         UserDto userDto = userDAOServiceImpl.getUser(id);
-        return userDto;
+        return ResponseEntity.ok(userDto);
     }
     @PostMapping("/newuser")
-    public  String newUser(@RequestBody UserDto udto) throws ParseException {
+    public  ResponseEntity newUser(@RequestBody UserDto udto) throws ParseException {
         if(userDAOServiceImpl.addUser(udto)){
-            return "Add user successfully!";
+            return ResponseEntity.ok("Add user successfully!");
         }
         else {
-            return "Add user fail!";
+            return ResponseEntity.ok("Add user fail!");
         }
     }
     @PutMapping("/updateuser")
-    public  String editUser(@RequestBody UserDto userDto){
+    public  ResponseEntity editUser(@RequestBody UserDto userDto){
         if(userDAOServiceImpl.updateUser(userDto))
-            return "Update Successfully!";
+            return ResponseEntity.ok("Update Successfully!");
         else {
-            return "Update Fail!";
+            return ResponseEntity.ok("Update Fail!");
         }
     }
     @DeleteMapping("/deleteuser")
-    public String deleteUser(@RequestParam int id){
+    public ResponseEntity deleteUser(@RequestParam int id){
         if(userDAOServiceImpl.deleteUser(id)){
-            return "Delete User Successfully!";
+            return ResponseEntity.ok("Delete User Successfully!");
         }
         else{
-            return "Delete Fail!";
+            return ResponseEntity.ok("Delete Fail!");
         }
     }
     @GetMapping("/statistics/reportcheckin")
-    public List<ReportCheckin> showReportcheckin(){
+    public ResponseEntity showReportcheckin(){
         try {
-            return checkinDAOServiceImpl.StatisticsReportCheckin();
+            return ResponseEntity.ok(checkinDAOServiceImpl.statisticsReportCheckin());
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
     }
     @PostMapping("/search")
-    public List<UserDto> SearchEmployee(@RequestParam String name){
+    public ResponseEntity searchEmployee(@RequestParam String name){
         if(name.equals(""))
-            return null;
+            return ResponseEntity.ok("NULL");
         List<UserDto> userDtoList = userDAOServiceImpl.findUserByName(name);
-        return userDtoList;
+        return ResponseEntity.ok(userDtoList);
     }
     //viewcheckin employee default week
     @GetMapping("/viewreportcheckin/{codecheckin}")
-    public List<ReportCheckin> ViewCheckin(@PathVariable int codecheckin){
-        Calendar calendar = Calendar.getInstance();
-        int weekofyear = calendar.get(Calendar.WEEK_OF_YEAR);
-        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.findReportCheckinByCodecheckin(codecheckin);
+    public ResponseEntity viewCheckinEmployeeDefault(@PathVariable int codecheckin){
+        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.reportCheckin(codecheckin);
         if (reportCheckinList.isEmpty()){
-            System.out.println("null");
-            return null;
+            return ResponseEntity.ok("NULL");
         }
-        List<ReportCheckin> reportCheckinWeekNowList = new ArrayList<>();
-        reportCheckinList.forEach(reportCheckin -> {
-            if (reportCheckin.getCheckin().getWeekofyear()==weekofyear) {
-                reportCheckinWeekNowList.add(reportCheckin);
-            }
-        });
-        return reportCheckinWeekNowList;
+        return ResponseEntity.ok(reportCheckinList);
     }
     @PostMapping("/viewreportcheckin/{codecheckin}")
-    public List<ReportCheckin> ViewCheckin(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin ){
-        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.ShowReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(), codecheckin);
+    public List<ReportCheckin> viewCheckinEmployeeByTime(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin ){
+        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.showReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(), codecheckin);
         return reportCheckinList;
     }
     //viewfault checkin employee
     @GetMapping("/fault/{codecheckin}")
-    public ResponseEntity<List<ReportCheckin>> ShowFaultCheckinDefault(@PathVariable int codecheckin){
-        Calendar calendar = Calendar.getInstance();
-        int monthofyear = calendar.get(Calendar.MONTH)+1;
-        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.findReportCheckinByCodecheckin(codecheckin);
-        if (reportCheckinList.isEmpty()){
-            System.out.println("null");
-            return null;
+    public ResponseEntity showFaultCheckinEmployeeDefault(@PathVariable int codecheckin){
+        List<ReportCheckin> faultCheckinList = checkinDAOServiceImpl.faultCheckin(codecheckin);
+        if (faultCheckinList.isEmpty()){
+            return ResponseEntity.ok("NULL");
         }
-        List<ReportCheckin> faultCheckinList = new ArrayList<>();
-        reportCheckinList.forEach(reportCheckin -> {
-            if (reportCheckin.getCheckin().getMonthofyear()==monthofyear&&reportCheckin.getStatus().equals(EnumStatus.NOTOK)) {
-                faultCheckinList.add(reportCheckin);
-            }
-        });
         return ResponseEntity.ok(faultCheckinList);
     }
     @PostMapping("/fault/{codecheckin}")
-    public List<ReportCheckin> ShowFaultCheckinDefault(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin){
-        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.ShowReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(),codecheckin);
-        if (reportCheckinList.isEmpty()){
-            System.out.println("null");
-            return null;
+    public ResponseEntity showFaultCheckinEmployeeByTime(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin){
+        List<ReportCheckin> faultCheckinList = checkinDAOServiceImpl.showFaultCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(),codecheckin);
+        if (faultCheckinList.isEmpty()){
+            return ResponseEntity.ok("NULL");
         }
-        List<ReportCheckin> faultCheckinList = new ArrayList<>();
-        reportCheckinList.forEach(reportCheckin -> {
-            if (reportCheckin.getStatus().equals(EnumStatus.NOTOK)) {
-                faultCheckinList.add(reportCheckin);
-            }
-        });
-        return faultCheckinList;
+        return ResponseEntity.ok(faultCheckinList);
     }
-
-
     //Test
     @Autowired
     UserRepository userRepository;
@@ -161,7 +131,6 @@ public class AdminController {
         List<IUserProjection> userProjectionList = userRepository.findBy(IUserProjection.class);
         return userProjectionList;
     }
-
     @GetMapping("/findallsort")
     public List<User> findAllSort(){
         Sort sort =Sort.by("id").descending();

@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableCaching
-public class ManageEmployeeApplication {
+public class    ManageEmployeeApplication {
     public static void main(String[] args) {
         SpringApplication.run(ManageEmployeeApplication.class, args);
     }

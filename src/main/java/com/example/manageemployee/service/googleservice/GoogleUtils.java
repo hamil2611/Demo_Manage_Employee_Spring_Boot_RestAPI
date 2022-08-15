@@ -37,6 +37,7 @@ public class GoogleUtils {
         String response = Request.Get(link).execute().returnContent().asString();
         ObjectMapper mapper = new ObjectMapper();
         GooglePojo googlePojo = mapper.readValue(response, GooglePojo.class);
+        System.out.println("------------------------------");
         System.out.println(googlePojo.getEmail());
         return googlePojo;
     }
