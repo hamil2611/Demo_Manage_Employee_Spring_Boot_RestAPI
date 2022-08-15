@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-
 class UserThread extends Thread {
     public void run() {
         for(int i=1; i <= 10; i++) {
