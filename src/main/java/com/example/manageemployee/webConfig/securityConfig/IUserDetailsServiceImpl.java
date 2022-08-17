@@ -1,6 +1,6 @@
 package com.example.manageemployee.webConfig.securityConfig;
 
-import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.model.entity.user.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;

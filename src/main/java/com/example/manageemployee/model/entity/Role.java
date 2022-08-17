@@ -1,5 +1,6 @@
 package com.example.manageemployee.model.entity;
 
+import com.example.manageemployee.model.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

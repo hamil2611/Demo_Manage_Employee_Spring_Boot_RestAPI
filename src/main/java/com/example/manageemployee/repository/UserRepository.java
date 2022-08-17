@@ -1,19 +1,19 @@
 package com.example.manageemployee.repository;
 
 import com.example.manageemployee.model.entity.Role;
-import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.model.entity.user.User;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> , JpaSpecificationExecutor<User> {
     List<User> findAllByRole(Role role);
     List<User> findAllByCodecheckin(Integer CodeCheckin);
     List<User> findAllByUsername(String username);
@@ -26,7 +26,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Cacheable(cacheNames="findallemployee",condition="#id > 1")
     @Query(value = "select * from user,role where user.role_id=role.id and role.name='ROLE_EMPLOYEE'",nativeQuery = true)
     List<User> findAllEmployee();
-    @Query("select new com.example.manageemployee.model.entity.User(u.fullname) from User as u")
+    @Query("select new com.example.manageemployee.model.entity.user.User(u.fullname) from User as u")
     List<User> getUsers();
     @Cacheable(cacheNames="findby", condition="#id > 1")
     <T> List<T> findBy(Class<T> classType);

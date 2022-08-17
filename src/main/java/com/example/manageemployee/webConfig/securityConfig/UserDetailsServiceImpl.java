@@ -1,6 +1,6 @@
 package com.example.manageemployee.webConfig.securityConfig;
 
-import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.model.entity.user.User;
 import com.example.manageemployee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;

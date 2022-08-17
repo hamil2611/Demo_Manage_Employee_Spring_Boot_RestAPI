@@ -1,4 +1,4 @@
-package com.example.manageemployee.model.ProjectionInterface;
+package com.example.manageemployee.model.entity.user.projection;
 
 import com.example.manageemployee.model.entity.Role;
 import lombok.Value;

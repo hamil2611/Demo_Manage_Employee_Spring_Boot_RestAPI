@@ -2,7 +2,7 @@ package com.example.manageemployee.service.roleservice;
 
 import com.example.manageemployee.model.dto.RoleDto;
 import com.example.manageemployee.model.entity.Role;
-import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.model.entity.user.User;
 import com.example.manageemployee.repository.RoleRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,6 +4,7 @@ import com.example.manageemployee.model.dto.CheckinDto;
 import com.example.manageemployee.model.dto.OnLeaveDto;
 import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.model.entity.Role;
+import com.example.manageemployee.model.entity.user.SearchUser;
 
 import java.util.List;
 
@@ -21,5 +22,6 @@ public interface UserService {
     public boolean joinPorject(int userid,int projectid);
     public List<Role> getRoles();
     public UserDto getUserByEmail(String email);
+    public List<UserDto> SearchUser(SearchUser searchUser);
 
 }

@@ -1,8 +1,8 @@
 package com.example.manageemployee.Test;
 
 import com.example.manageemployee.jwt.JwtService;
-import com.example.manageemployee.model.ProjectionInterface.IUserProjection;
-import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.model.entity.user.projection.IUserProjection;
+import com.example.manageemployee.model.entity.user.User;
 import com.example.manageemployee.repository.RoleRepository;
 import com.example.manageemployee.repository.UserRepository;
 import com.example.manageemployee.service.checkinservice.CheckinServiceImpl;

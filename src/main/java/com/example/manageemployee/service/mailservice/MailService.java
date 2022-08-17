@@ -1,7 +1,7 @@
 package com.example.manageemployee.service.mailservice;
 
 import com.example.manageemployee.model.entity.Checkin;
-import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.model.entity.user.User;
 import com.example.manageemployee.repository.CheckinRepository;
 import com.example.manageemployee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,10 +68,10 @@ public class MailService {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
         SimpleDateFormat formatDatecreated = new SimpleDateFormat("yyyy-MM-dd");
         List<User> listUser = userRepository.findAll();
-        Date date_today = formatDatecreated.parse(formatDatecreated.format(new Date()));
-        List<Checkin> list_checkin = checkinRepository.findAllByDatecreated(date_today);
-        System.out.println(list_checkin.size());
-        list_checkin.forEach(i->{
+        Date today = formatDatecreated.parse(formatDatecreated.format(new Date()));
+        List<Checkin> listCheckin = checkinRepository.findAllByDatecreated(today);
+        System.out.println(listCheckin.size());
+        listCheckin.forEach(i->{
             LocalTime timeCheckin = LocalTime.parse(format.format(i.getTimecheckin()));
             if (timeCheckin.isBefore(TIMECHECKIN)){
                 LocalTime timeCheckout = LocalTime.parse(format.format(i.getTimecheckout()));
@@ -84,8 +84,8 @@ public class MailService {
                         }
                     });
                 }else{
-                    List<User> list_user_checklate= userRepository.findAllByCodecheckin(i.getCodecheckin());
-                    listUser.remove(list_user_checklate.get(0));
+                    List<User> listUserChecklate= userRepository.findAllByCodecheckin(i.getCodecheckin());
+                    listUser.remove(listUserChecklate.get(0));
                 }
             }else{//checkin muon
                 if(i.getTimecheckout()!=null) { //
