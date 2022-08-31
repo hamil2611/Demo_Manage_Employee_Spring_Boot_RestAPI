@@ -1,13 +1,15 @@
 package com.example.manageemployee.controller;
 
-import com.example.manageemployee.model.ProjectionInterface.IUserProjection;
+import com.example.manageemployee.model.entity.user.SearchUser;
+import com.example.manageemployee.model.entity.user.projection.IUserProjection;
 import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.model.entity.ReportCheckin;
 import com.example.manageemployee.model.entity.Role;
-import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.model.entity.user.User;
 import com.example.manageemployee.repository.CheckinRepository;
 import com.example.manageemployee.repository.UserRepository;
 import com.example.manageemployee.service.checkinservice.CheckinServiceImpl;
+import com.example.manageemployee.service.userservice.UserService;
 import com.example.manageemployee.service.userservice.UserServiceImpl;
 import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +29,13 @@ import java.util.List;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
-    private final UserServiceImpl userDAOServiceImpl;
+    private final UserService userDAOServiceImpl;
     private final CheckinServiceImpl checkinDAOServiceImpl;
     //HTTP Method
     @GetMapping("/viewemployee")
     public ResponseEntity<List<UserDto>> viewEmployee(){
         UserPrinciple userPrinciple = (UserPrinciple) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println(userPrinciple.getPassword());
+        System.out.println("password "+userPrinciple.getPassword());
         List<UserDto> userDtoList = userDAOServiceImpl.findAllEmployee();
         System.out.println("***Before Return List (FETCH EAGER)***");
         return ResponseEntity.status(HttpStatus.OK).body(userDtoList);
@@ -84,42 +86,30 @@ public class AdminController {
         }
     }
     @PostMapping("/search")
-    public ResponseEntity searchEmployee(@RequestParam String name){
-        if(name.equals(""))
-            return ResponseEntity.ok("NULL");
-        List<UserDto> userDtoList = userDAOServiceImpl.findUserByName(name);
-        return ResponseEntity.ok(userDtoList);
+    public ResponseEntity<List<UserDto>> searchEmployee(@RequestParam String name){
+        return ResponseEntity.ok(userDAOServiceImpl.findUserByName(name));
     }
     //viewcheckin employee default week
     @GetMapping("/viewreportcheckin/{codecheckin}")
-    public ResponseEntity viewCheckinEmployeeDefault(@PathVariable int codecheckin){
-        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.reportCheckin(codecheckin);
-        if (reportCheckinList.isEmpty()){
-            return ResponseEntity.ok("NULL");
-        }
-        return ResponseEntity.ok(reportCheckinList);
+    public ResponseEntity<List<ReportCheckin>> viewCheckinEmployeeDefault(@PathVariable int codecheckin){
+        return ResponseEntity.ok(checkinDAOServiceImpl.reportCheckin(codecheckin));
     }
     @PostMapping("/viewreportcheckin/{codecheckin}")
-    public List<ReportCheckin> viewCheckinEmployeeByTime(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin ){
-        List<ReportCheckin> reportCheckinList = checkinDAOServiceImpl.showReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(), codecheckin);
-        return reportCheckinList;
+    public ResponseEntity<List<ReportCheckin>> viewCheckinEmployeeByTime(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin ){
+        return ResponseEntity.ok(checkinDAOServiceImpl.showReportCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(), codecheckin));
     }
     //viewfault checkin employee
     @GetMapping("/fault/{codecheckin}")
     public ResponseEntity showFaultCheckinEmployeeDefault(@PathVariable int codecheckin){
-        List<ReportCheckin> faultCheckinList = checkinDAOServiceImpl.faultCheckin(codecheckin);
-        if (faultCheckinList.isEmpty()){
-            return ResponseEntity.ok("NULL");
-        }
-        return ResponseEntity.ok(faultCheckinList);
+        return ResponseEntity.ok(checkinDAOServiceImpl.faultCheckin(codecheckin));
     }
     @PostMapping("/fault/{codecheckin}")
-    public ResponseEntity showFaultCheckinEmployeeByTime(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin){
-        List<ReportCheckin> faultCheckinList = checkinDAOServiceImpl.showFaultCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(),codecheckin);
-        if (faultCheckinList.isEmpty()){
-            return ResponseEntity.ok("NULL");
-        }
-        return ResponseEntity.ok(faultCheckinList);
+    public ResponseEntity<List<ReportCheckin>> showFaultCheckinEmployeeByTime(@RequestBody SortByTime sortByTime,@PathVariable int codecheckin){
+        return ResponseEntity.ok(checkinDAOServiceImpl.showFaultCheckinByTime(sortByTime.getStarttime(),sortByTime.getEndtime(),codecheckin));
+    }
+    @PostMapping("/searchuser")
+    public ResponseEntity<List<UserDto>> searchUserSpecification(@RequestBody SearchUser searchUser){
+        return ResponseEntity.ok(userDAOServiceImpl.SearchUser(searchUser));
     }
     //Test
     @Autowired

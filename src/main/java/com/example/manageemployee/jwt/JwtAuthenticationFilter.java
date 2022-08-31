@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
@@ -38,6 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserPrinciple userPrinciple =(UserPrinciple) authentication.getPrincipal();
                 System.out.println("(Method doFilter) Test ContextHolder: "+ userPrinciple.getUsername());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
             }
         } catch (Exception e) {
             logger.error("Can NOT set user authentication -> Message: {}", e);

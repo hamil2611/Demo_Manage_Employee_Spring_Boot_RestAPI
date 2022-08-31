@@ -1,7 +1,6 @@
 package com.example.manageemployee.webConfig.securityConfig;
 
 import com.example.manageemployee.jwt.JwtAuthenticationFilter;
-import com.example.manageemployee.model.entity.User;
 import com.example.manageemployee.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -35,14 +33,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        System.out.println("JwtAuthenticationFilter");
         return new JwtAuthenticationFilter();
     }
     @Bean
     public AuthenticationManager authenticationManager() throws Exception{
+        System.out.println("AuthenticationManager");
         return super.authenticationManager();
     }
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        System.out.println("configure");
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
     }
     @Override

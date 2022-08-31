@@ -1,5 +1,6 @@
 package com.example.manageemployee.model.entity;
 
+import com.example.manageemployee.model.entity.user.User;
 import com.example.manageemployee.model.enummodel.EnumDurationOnleave;
 import com.example.manageemployee.model.enummodel.EnumTypeOnLeave;
 import lombok.AllArgsConstructor;

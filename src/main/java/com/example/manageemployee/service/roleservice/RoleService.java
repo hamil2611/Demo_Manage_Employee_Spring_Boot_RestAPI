@@ -1,7 +1,7 @@
 package com.example.manageemployee.service.roleservice;
 
 import com.example.manageemployee.model.dto.RoleDto;
-import com.example.manageemployee.model.entity.User;
+import com.example.manageemployee.model.entity.user.User;
 
 import java.util.List;
 

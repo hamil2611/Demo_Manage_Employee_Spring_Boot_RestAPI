@@ -4,15 +4,25 @@ import com.example.manageemployee.model.dto.CheckinDto;
 import com.example.manageemployee.model.dto.OnLeaveDto;
 import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.model.entity.*;
+import com.example.manageemployee.model.entity.user.SearchUser;
+import com.example.manageemployee.model.entity.user.User;
+import com.example.manageemployee.model.entity.user.UserSpecification;
 import com.example.manageemployee.repository.*;
 import com.example.manageemployee.service.mailservice.MailService;
+import com.example.manageemployee.service.roleservice.RoleService;
 import com.example.manageemployee.service.roleservice.RoleServiceImpl;
 import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -35,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
-    RoleServiceImpl roleDAOServiceImpl;
+    RoleService roleDAOServiceImpl;
     @Autowired
     MailService mailService;
     @Override
@@ -204,5 +214,11 @@ public class UserServiceImpl implements UserService {
             return null;
         UserDto userDto = this.modelMapper.map(user,UserDto.class);
         return userDto;
+    }
+
+    @Override
+    public List<UserDto> SearchUser(SearchUser searchUser) {
+        UserSpecification userSpecification = new UserSpecification(searchUser);
+        return  userRepository.findAll(Specification.where(userSpecification)).stream().map(user -> modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
     }
 }

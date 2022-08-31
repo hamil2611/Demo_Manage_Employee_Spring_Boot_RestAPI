@@ -3,31 +3,22 @@ package com.example.manageemployee.controller;
 import com.example.manageemployee.jwt.JwtResponse;
 import com.example.manageemployee.jwt.JwtService;
 import com.example.manageemployee.model.dto.UserDto;
-import com.example.manageemployee.model.entity.User;
-import com.example.manageemployee.service.googleservice.GooglePojo;
+import com.example.manageemployee.model.entity.user.User;
 import com.example.manageemployee.service.googleservice.GoogleService;
-import com.example.manageemployee.service.googleservice.GoogleUtils;
 import com.example.manageemployee.service.mailservice.MailService;
 import com.example.manageemployee.service.userservice.UserServiceImpl;
-import com.example.manageemployee.webConfig.securityConfig.IUserDetailsServiceImpl;
-import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Date;
 
 
 @RestController

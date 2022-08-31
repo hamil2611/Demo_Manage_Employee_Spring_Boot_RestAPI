@@ -1,5 +1,6 @@
 package com.example.manageemployee.model.entity;
 
+import com.example.manageemployee.model.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

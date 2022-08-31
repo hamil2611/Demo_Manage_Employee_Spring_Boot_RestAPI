@@ -1,10 +1,13 @@
-package com.example.manageemployee.model.entity;
+package com.example.manageemployee.model.entity.user;
 
+import com.example.manageemployee.model.entity.Project;
+import com.example.manageemployee.model.entity.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -22,6 +25,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@Scope("singleton")
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

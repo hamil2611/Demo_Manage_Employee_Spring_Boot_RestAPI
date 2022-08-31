@@ -1,5 +1,6 @@
 package com.example.manageemployee.service.googleservice;
 
+import com.example.manageemployee.jwt.JwtResponse;
 import com.example.manageemployee.model.dto.UserDto;
 import com.example.manageemployee.service.userservice.UserServiceImpl;
 import com.example.manageemployee.webConfig.securityConfig.IUserDetailsServiceImpl;
@@ -7,6 +8,7 @@ import com.example.manageemployee.webConfig.securityConfig.UserPrinciple;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +30,7 @@ public class GoogleService {
     private static final String SECRET_KEY = "123456789";
     private static final long EXPIRE_TIME = 86400000000L;
 
-    public String googleLogin(HttpServletRequest request) throws IOException {
+    public ResponseEntity<?> googleLogin(HttpServletRequest request) throws IOException {
         String code = request.getParameter("code");
 //        if (code == null || code.isEmpty()) {
 //            return "redirect:/login?google=error";
@@ -40,10 +42,13 @@ public class GoogleService {
         System.out.println("Get UserInfo Complete!");
         UserDetails userDetail = googleUtils.buildUser(googlePojo);
         System.out.println("Get buildUser Complete!");
-        System.out.println("loginGoogle" + userDetail.getUsername());
+        System.out.println("loginGoogle: " + userDetail.getUsername());
         UserDto userDto = userDAOServiceImpl.getUserByEmail(googlePojo.getEmail());
-        if (userDto==null)
-            return "NULL";
+        if (userDto==null){
+            System.out.println("EMAIL DOES NOT EXIST!");
+            return ResponseEntity.ok("EMAIL DOES NOT EXIST!");
+        }
+
         String jwt = Jwts.builder()
                 .setSubject((userDto.getUsername()))
                 .setIssuedAt(new Date())
@@ -57,6 +62,6 @@ public class GoogleService {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         UserPrinciple userPrinciple =(UserPrinciple) authentication.getPrincipal();
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return jwt;
+        return ResponseEntity.ok(new JwtResponse(jwt,"Bearer",userDetails.getUsername(), userDetails.getAuthorities() ));
     }
 }
